@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Ticket, User, Mail, Phone, CreditCard, ShieldCheck, Sparkles, CheckCircle } from 'lucide-react';
+import { X, Ticket, User, Mail, Phone, CreditCard, ShieldCheck, Sparkles, CheckCircle, Upload, Camera, Trash2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { formatNGN } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
@@ -15,10 +15,27 @@ export const TicketBookingModal = () => {
     name: 'Adewunmi Esther Opeyemi',
     email: 'esther.3mtt@example.com',
     phone: '08123456789',
+    avatar: '', // Base64 or uploaded image URL
   });
   const [isProcessing, setIsProcessing] = useState(false);
 
   const totalPrice = selectedTier ? selectedTier.price * quantity : 0;
+
+  // Handle Photo File Upload
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image file size must be less than 5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAttendee(prev => ({ ...prev, avatar: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
@@ -53,7 +70,7 @@ export const TicketBookingModal = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-900/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-xl glass-modal rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-xl glass-modal rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl max-h-[92vh] flex flex-col">
         
         {/* Modal Header */}
         <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-dark-900/90">
@@ -141,11 +158,57 @@ export const TicketBookingModal = () => {
             </div>
           </div>
 
-          {/* Step 3: Attendee Details */}
-          <div className="space-y-3">
+          {/* Step 3: Attendee Details & Avatar Upload */}
+          <div className="space-y-4">
             <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-              3. Attendee Information
+              3. Attendee Information & Ticket Photo
             </label>
+
+            {/* Custom Photo Upload Box */}
+            <div className="p-4 bg-dark-800/90 rounded-2xl border border-slate-700/80 space-y-3">
+              <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                <Camera className="w-4 h-4 text-brand-400" />
+                Upload Ticket Pass Photo (Optional)
+              </span>
+
+              <div className="flex items-center gap-4">
+                {/* Photo Preview Thumbnail */}
+                <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-purple-500/40 bg-purple-950/60 shrink-0 flex items-center justify-center">
+                  {attendee.avatar ? (
+                    <img src={attendee.avatar} alt="Uploaded Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="w-8 h-8 text-slate-500" />
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-2">
+                  <label className="inline-flex items-center gap-2 px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl cursor-pointer transition-colors shadow-md">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>{attendee.avatar ? 'Change Photo' : 'Upload Your Image'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {attendee.avatar && (
+                    <button
+                      type="button"
+                      onClick={() => setAttendee({ ...attendee, avatar: '' })}
+                      className="ml-2 text-xs text-rose-400 hover:text-rose-300 font-semibold inline-flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3 h-3" /> Remove
+                    </button>
+                  )}
+
+                  <p className="text-[11px] text-slate-400">
+                    Your photo will be printed directly onto your digital QR ticket pass.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             <div className="space-y-2.5">
               <div className="relative">
@@ -217,7 +280,7 @@ export const TicketBookingModal = () => {
             {isProcessing ? (
               <span className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Generating QR Ticket Pass...
+                Generating Personalized Ticket Pass...
               </span>
             ) : (
               <>

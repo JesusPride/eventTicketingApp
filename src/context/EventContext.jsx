@@ -84,6 +84,7 @@ export const EventProvider = ({ children }) => {
         attendeeName: attendee.name,
         attendeeEmail: attendee.email,
         attendeePhone: attendee.phone,
+        attendeeAvatar: attendee.avatar || null,
         qrPayload,
         purchaseDate: new Date().toISOString(),
         isUsed: false,
