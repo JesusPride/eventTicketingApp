@@ -1,27 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Ticket, User, Mail, Phone, CreditCard, ShieldCheck, Sparkles, CheckCircle, Upload, Camera, Trash2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { formatNGN } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const TicketBookingModal = () => {
-  const { selectedEvent, setActiveModal, setSelectedTicketPass, purchaseTicket } = useEventContext();
+  const { selectedEvent, setActiveModal, setSelectedTicketPass, purchaseTicket, currentUser } = useEventContext();
 
   if (!selectedEvent) return null;
 
   const [selectedTier, setSelectedTier] = useState(selectedEvent.tickets[0]);
   const [quantity, setQuantity] = useState(1);
   const [attendee, setAttendee] = useState({
-    name: 'Adewunmi Esther Opeyemi',
-    email: 'esther.3mtt@example.com',
-    phone: '08123456789',
-    avatar: '', // Base64 or uploaded image URL
+    name: currentUser ? currentUser.name : 'Adewunmi Esther Opeyemi',
+    email: currentUser ? currentUser.email : 'esther.3mtt@example.com',
+    phone: currentUser?.phone || '08123456789',
+    avatar: currentUser?.avatar || '',
   });
   const [isProcessing, setIsProcessing] = useState(false);
 
+  useEffect(() => {
+    if (currentUser) {
+      setAttendee(prev => ({
+        ...prev,
+        name: currentUser.name,
+        email: currentUser.email,
+        phone: currentUser.phone || prev.phone,
+        avatar: currentUser.avatar || prev.avatar,
+      }));
+    }
+  }, [currentUser]);
+
   const totalPrice = selectedTier ? selectedTier.price * quantity : 0;
 
-  // Handle Photo File Upload
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -49,7 +60,6 @@ export const TicketBookingModal = () => {
         attendee,
       });
 
-      // Launch Confetti Celebration
       confetti({
         particleCount: 100,
         spread: 70,
@@ -58,7 +68,6 @@ export const TicketBookingModal = () => {
 
       setIsProcessing(false);
       
-      // Automatically show the first created ticket pass
       if (createdTickets && createdTickets.length > 0) {
         setSelectedTicketPass(createdTickets[0]);
         setActiveModal('ticketPass');
@@ -168,11 +177,10 @@ export const TicketBookingModal = () => {
             <div className="p-4 bg-dark-800/90 rounded-2xl border border-slate-700/80 space-y-3">
               <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
                 <Camera className="w-4 h-4 text-brand-400" />
-                Upload Ticket Pass Photo (Optional)
+                Ticket Pass Photo (Auto-filled from profile or upload new)
               </span>
 
               <div className="flex items-center gap-4">
-                {/* Photo Preview Thumbnail */}
                 <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-purple-500/40 bg-purple-950/60 shrink-0 flex items-center justify-center">
                   {attendee.avatar ? (
                     <img src={attendee.avatar} alt="Uploaded Avatar" className="w-full h-full object-cover" />
@@ -202,10 +210,6 @@ export const TicketBookingModal = () => {
                       <Trash2 className="w-3 h-3" /> Remove
                     </button>
                   )}
-
-                  <p className="text-[11px] text-slate-400">
-                    Your photo will be printed directly onto your digital QR ticket pass.
-                  </p>
                 </div>
               </div>
             </div>
@@ -265,13 +269,6 @@ export const TicketBookingModal = () => {
             </div>
           </div>
 
-          {/* Guarantee Note */}
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-brand-400 shrink-0" />
-            <span>Instant digital ticket pass with scannable QR code generated upon payment.</span>
-          </div>
-
-          {/* Submit CTA */}
           <button
             type="submit"
             disabled={isProcessing}

@@ -12,10 +12,40 @@ import { generateTicketId, generateQRPayload } from '../utils/formatters';
 
 const EventContext = createContext();
 
+const DEFAULT_USER = {
+  id: 'usr-001',
+  name: 'Adewunmi Esther Opeyemi',
+  email: 'esther.3mtt@example.com',
+  handle: '@Jesuspride',
+  phone: '08123456789',
+  role: 'attendee', // 'attendee' or 'organizer'
+  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+};
+
+const DEMO_ORGANIZER = {
+  id: 'usr-002',
+  name: '3MTT Events Team',
+  email: 'organizer.3mtt@example.com',
+  handle: '@3MTTHost',
+  phone: '08098765432',
+  role: 'organizer',
+  avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
+};
+
 export const EventProvider = ({ children }) => {
   const [events, setEvents] = useState(() => getStoredEvents(INITIAL_EVENTS));
   const [tickets, setTickets] = useState(() => getStoredTickets());
   const [checkIns, setCheckIns] = useState(() => getStoredCheckIns());
+
+  // User Auth State
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('eventpulse_user_v1');
+      return saved ? JSON.parse(saved) : DEFAULT_USER;
+    } catch (e) {
+      return DEFAULT_USER;
+    }
+  });
 
   // Search and Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,7 +54,7 @@ export const EventProvider = ({ children }) => {
   const [priceFilter, setPriceFilter] = useState('All'); // All, Free, Paid
 
   // Modals & Active State
-  const [activeModal, setActiveModal] = useState(null); // 'booking', 'ticketPass', 'createEvent', 'qrScanner'
+  const [activeModal, setActiveModal] = useState(null); // 'booking', 'ticketPass', 'createEvent', 'qrScanner', 'auth'
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedTicketPass, setSelectedTicketPass] = useState(null);
 
@@ -49,6 +79,65 @@ export const EventProvider = ({ children }) => {
   useEffect(() => {
     saveCheckIns(checkIns);
   }, [checkIns]);
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('eventpulse_user_v1', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('eventpulse_user_v1');
+    }
+  }, [currentUser]);
+
+  // Auth Handlers
+  const loginUser = (email, password) => {
+    if (email.includes('organizer')) {
+      setCurrentUser(DEMO_ORGANIZER);
+      showToast('Logged in as Event Host Organizer!', 'success');
+    } else {
+      setCurrentUser({
+        id: `usr-${Date.now()}`,
+        name: email.split('@')[0].replace('.', ' '),
+        email,
+        handle: `@${email.split('@')[0]}`,
+        phone: '08123456789',
+        role: 'attendee',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+      });
+      showToast(`Welcome back, ${email.split('@')[0]}!`, 'success');
+    }
+    setActiveModal(null);
+  };
+
+  const quickDemoLogin = (role) => {
+    if (role === 'organizer') {
+      setCurrentUser(DEMO_ORGANIZER);
+      showToast('Signed in as Organizer Host (3MTT Team)', 'success');
+    } else {
+      setCurrentUser(DEFAULT_USER);
+      showToast('Signed in as Attendee (Adewunmi Esther Opeyemi)', 'success');
+    }
+    setActiveModal(null);
+  };
+
+  const signupUser = (name, email, role, avatar) => {
+    const newUser = {
+      id: `usr-${Date.now()}`,
+      name,
+      email,
+      handle: `@${name.toLowerCase().replace(/\s+/g, '')}`,
+      phone: '08123456789',
+      role,
+      avatar: avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    };
+    setCurrentUser(newUser);
+    showToast(`Account created! Welcome ${name}`, 'success');
+    setActiveModal(null);
+  };
+
+  const logoutUser = () => {
+    setCurrentUser(null);
+    showToast('Signed out successfully', 'info');
+  };
 
   // Buy Ticket Handler
   const purchaseTicket = ({ event, ticketType, quantity, attendee }) => {
@@ -84,7 +173,7 @@ export const EventProvider = ({ children }) => {
         attendeeName: attendee.name,
         attendeeEmail: attendee.email,
         attendeePhone: attendee.phone,
-        attendeeAvatar: attendee.avatar || null,
+        attendeeAvatar: attendee.avatar || (currentUser ? currentUser.avatar : null),
         qrPayload,
         purchaseDate: new Date().toISOString(),
         isUsed: false,
@@ -103,7 +192,7 @@ export const EventProvider = ({ children }) => {
   const addEvent = (newEventData) => {
     const newEvent = {
       id: `evt-${Date.now()}`,
-      organizer: newEventData.organizer || 'Adewunmi Esther Opeyemi (Organizing Host)',
+      organizer: currentUser ? currentUser.name : 'Adewunmi Esther Opeyemi (Organizing Host)',
       featured: false,
       ...newEventData,
     };
@@ -115,15 +204,12 @@ export const EventProvider = ({ children }) => {
   const verifyAndCheckInTicket = (ticketIdOrPayload) => {
     let cleanTicketId = ticketIdOrPayload.trim();
     
-    // Check if input is raw JSON QR payload
     try {
       if (ticketIdOrPayload.startsWith('{')) {
         const parsed = JSON.parse(ticketIdOrPayload);
         cleanTicketId = parsed.tkt;
       }
-    } catch (e) {
-      // Input is string ID
-    }
+    } catch (e) {}
 
     const ticketIndex = tickets.findIndex(t => t.id.toLowerCase() === cleanTicketId.toLowerCase());
 
@@ -161,7 +247,6 @@ export const EventProvider = ({ children }) => {
       };
     }
 
-    // Mark as used
     const nowIso = new Date().toISOString();
     const updatedTickets = [...tickets];
     updatedTickets[ticketIndex] = {
@@ -192,13 +277,13 @@ export const EventProvider = ({ children }) => {
     };
   };
 
-  // Reset to sample state
   const resetDemoData = () => {
     setEvents(INITIAL_EVENTS);
     setTickets([]);
     setCheckIns([]);
+    setCurrentUser(DEFAULT_USER);
     localStorage.clear();
-    showToast('Demo data reset to initial default state.', 'info');
+    showToast('Demo data reset to default state.', 'info');
   };
 
   return (
@@ -207,6 +292,11 @@ export const EventProvider = ({ children }) => {
         events,
         tickets,
         checkIns,
+        currentUser,
+        loginUser,
+        quickDemoLogin,
+        signupUser,
+        logoutUser,
         searchQuery,
         setSearchQuery,
         selectedCategory,

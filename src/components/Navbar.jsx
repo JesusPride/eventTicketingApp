@@ -1,9 +1,19 @@
-import React from 'react';
-import { Ticket, ScanLine, LayoutDashboard, Sparkles, Search, PlusCircle, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Ticket, ScanLine, LayoutDashboard, Sparkles, Search, PlusCircle, RefreshCw, LogIn, LogOut, User, ShieldCheck } from 'lucide-react';
 import { useEventContext } from '../context/EventContext';
 
 export const Navbar = ({ activeTab, setActiveTab }) => {
-  const { tickets, searchQuery, setSearchQuery, setActiveModal, resetDemoData } = useEventContext();
+  const { 
+    tickets, 
+    searchQuery, 
+    setSearchQuery, 
+    setActiveModal, 
+    resetDemoData, 
+    currentUser, 
+    logoutUser 
+  } = useEventContext();
+
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 w-full glass-card border-b border-slate-800/80 bg-dark-900/90 backdrop-blur-md">
@@ -105,11 +115,86 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
 
             <button
               onClick={() => setActiveModal('createEvent')}
-              className="ml-1 sm:ml-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-600/20 hover:scale-[1.02] transition-all"
+              className="ml-1 sm:ml-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-semibold text-xs sm:text-sm px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-600/20 hover:scale-[1.02] transition-all"
             >
               <PlusCircle className="w-4 h-4" />
               <span className="hidden sm:inline">Post Event</span>
             </button>
+
+            {/* Auth Profile Menu / Sign In Button */}
+            {currentUser ? (
+              <div className="relative ml-2">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 p-1 bg-dark-800/80 hover:bg-slate-800 border border-slate-700/80 rounded-2xl transition-all"
+                >
+                  <img
+                    src={currentUser.avatar}
+                    alt={currentUser.name}
+                    className="w-8 h-8 rounded-xl object-cover border border-brand-500/40"
+                  />
+                  <div className="hidden xl:block text-left pr-2">
+                    <p className="text-xs font-bold text-white line-clamp-1">{currentUser.name.split(' ')[0]}</p>
+                    <p className="text-[10px] text-brand-400 uppercase font-mono">{currentUser.role}</p>
+                  </div>
+                </button>
+
+                {/* Dropdown Menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-56 glass-modal rounded-2xl border border-slate-700 shadow-2xl p-2 z-50 animate-fadeIn">
+                    <div className="p-3 border-b border-slate-800">
+                      <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
+                      <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
+                      <span className="inline-block mt-1 px-2 py-0.5 bg-brand-500/20 border border-brand-500/30 text-brand-300 text-[10px] font-bold rounded-full uppercase">
+                        {currentUser.role} Account
+                      </span>
+                    </div>
+
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          setActiveTab('my-tickets');
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl flex items-center gap-2 font-medium"
+                      >
+                        <Ticket className="w-4 h-4 text-brand-400" /> My Digital Wallet
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setActiveTab('organizer');
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl flex items-center gap-2 font-medium"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-accent-400" /> Host Dashboard
+                      </button>
+                    </div>
+
+                    <div className="pt-1 border-t border-slate-800">
+                      <button
+                        onClick={() => {
+                          logoutUser();
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-xl flex items-center gap-2 font-bold"
+                      >
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setActiveModal('auth')}
+                className="ml-2 bg-dark-800 hover:bg-slate-800 text-brand-400 border border-brand-500/40 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Sign In</span>
+              </button>
+            )}
 
             <button
               onClick={resetDemoData}
