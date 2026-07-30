@@ -5,12 +5,12 @@ import { ExplorePage } from './pages/ExplorePage';
 import { MyTicketsPage } from './pages/MyTicketsPage';
 import { GateCheckInPage } from './pages/GateCheckInPage';
 import { OrganizerDashboard } from './pages/OrganizerDashboard';
+import { AuthPage } from './pages/AuthPage';
 
 import { EventModal } from './components/EventModal';
 import { TicketBookingModal } from './components/TicketBookingModal';
 import { TicketPassModal } from './components/TicketPassModal';
 import { CreateEventModal } from './components/CreateEventModal';
-import { AuthModal } from './components/AuthModal';
 import { Toast } from './components/Toast';
 import { Ticket, Heart, ShieldCheck } from 'lucide-react';
 
@@ -30,6 +30,7 @@ const AppContent = () => {
         {activeTab === 'my-tickets' && <MyTicketsPage setActiveTab={setActiveTab} />}
         {activeTab === 'gate-scanner' && <GateCheckInPage />}
         {activeTab === 'organizer' && <OrganizerDashboard setActiveTab={setActiveTab} />}
+        {activeTab === 'auth' && <AuthPage setActiveTab={setActiveTab} />}
       </main>
 
       {/* Active Modals */}
@@ -37,7 +38,6 @@ const AppContent = () => {
       {activeModal === 'booking' && <TicketBookingModal />}
       {activeModal === 'ticketPass' && <TicketPassModal />}
       {activeModal === 'createEvent' && <CreateEventModal />}
-      {activeModal === 'auth' && <AuthModal />}
 
       {/* Global Toast */}
       <Toast />

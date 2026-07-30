@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Ticket, ScanLine, LayoutDashboard, Sparkles, Search, PlusCircle, RefreshCw, LogIn, LogOut, User, ShieldCheck } from 'lucide-react';
+import { Ticket, ScanLine, LayoutDashboard, Sparkles, Search, PlusCircle, RefreshCw, LogIn, LogOut, UserCheck, Building2, ShieldCheck } from 'lucide-react';
 import { useEventContext } from '../context/EventContext';
 
 export const Navbar = ({ activeTab, setActiveTab }) => {
@@ -10,10 +10,13 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
     setActiveModal, 
     resetDemoData, 
     currentUser, 
-    logoutUser 
+    logoutUser,
+    quickDemoLogin 
   } = useEventContext();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const isOrganizer = currentUser?.role === 'organizer';
 
   return (
     <header className="sticky top-0 z-40 w-full glass-card border-b border-slate-800/80 bg-dark-900/90 backdrop-blur-md">
@@ -60,6 +63,8 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
 
           {/* Navigation Links */}
           <nav className="flex items-center gap-1 sm:gap-2">
+            
+            {/* Explore Link (Visible to All) */}
             <button
               onClick={() => setActiveTab('explore')}
               className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
@@ -72,6 +77,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
               <span className="hidden sm:inline">Explore</span>
             </button>
 
+            {/* My Tickets Link (Visible to All) */}
             <button
               onClick={() => setActiveTab('my-tickets')}
               className={`relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
@@ -89,39 +95,44 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
               )}
             </button>
 
-            <button
-              onClick={() => setActiveTab('gate-scanner')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                activeTab === 'gate-scanner' 
-                  ? 'bg-accent-500/15 text-accent-400 border border-accent-500/40 shadow-lg shadow-accent-500/10' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <ScanLine className="w-4 h-4 text-accent-400 animate-pulse" />
-              <span className="hidden md:inline">Gate Scanner</span>
-            </button>
+            {/* Organizer & Gatekeeper Only Navigation Links */}
+            {isOrganizer && (
+              <>
+                <button
+                  onClick={() => setActiveTab('gate-scanner')}
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    activeTab === 'gate-scanner' 
+                      ? 'bg-accent-500/15 text-accent-400 border border-accent-500/40 shadow-lg shadow-accent-500/10' 
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <ScanLine className="w-4 h-4 text-accent-400 animate-pulse" />
+                  <span className="hidden md:inline">Gate Scanner</span>
+                </button>
 
-            <button
-              onClick={() => setActiveTab('organizer')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                activeTab === 'organizer' 
-                  ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden lg:inline">Host Hub</span>
-            </button>
+                <button
+                  onClick={() => setActiveTab('organizer')}
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    activeTab === 'organizer' 
+                      ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30' 
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span className="hidden lg:inline">Host Hub</span>
+                </button>
 
-            <button
-              onClick={() => setActiveModal('createEvent')}
-              className="ml-1 sm:ml-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-semibold text-xs sm:text-sm px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-600/20 hover:scale-[1.02] transition-all"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Post Event</span>
-            </button>
+                <button
+                  onClick={() => setActiveModal('createEvent')}
+                  className="ml-1 sm:ml-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-semibold text-xs sm:text-sm px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-600/20 hover:scale-[1.02] transition-all"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">Post Event</span>
+                </button>
+              </>
+            )}
 
-            {/* Auth Profile Menu / Sign In Button */}
+            {/* User Profile & Auth Menu */}
             {currentUser ? (
               <div className="relative ml-2">
                 <button
@@ -139,15 +150,32 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                   </div>
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Profile Dropdown */}
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-56 glass-modal rounded-2xl border border-slate-700 shadow-2xl p-2 z-50 animate-fadeIn">
+                  <div className="absolute right-0 mt-2 w-64 glass-modal rounded-2xl border border-slate-700 shadow-2xl p-2 z-50 animate-fadeIn">
                     <div className="p-3 border-b border-slate-800">
                       <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
                       <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
-                      <span className="inline-block mt-1 px-2 py-0.5 bg-brand-500/20 border border-brand-500/30 text-brand-300 text-[10px] font-bold rounded-full uppercase">
-                        {currentUser.role} Account
-                      </span>
+                      <div className="mt-1 flex items-center justify-between">
+                        <span className={`px-2 py-0.5 border text-[10px] font-bold rounded-full uppercase ${
+                          isOrganizer 
+                            ? 'bg-accent-500/20 border-accent-500/40 text-accent-300'
+                            : 'bg-brand-500/20 border-brand-500/40 text-brand-300'
+                        }`}>
+                          {currentUser.role} Mode
+                        </span>
+
+                        {/* Switch Role Quick Button */}
+                        <button
+                          onClick={() => {
+                            quickDemoLogin(isOrganizer ? 'attendee' : 'organizer');
+                            setShowUserMenu(false);
+                          }}
+                          className="text-[10px] text-brand-400 hover:underline font-semibold"
+                        >
+                          Switch to {isOrganizer ? 'Attendee' : 'Host'} Mode
+                        </button>
+                      </div>
                     </div>
 
                     <div className="py-1">
@@ -161,15 +189,17 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                         <Ticket className="w-4 h-4 text-brand-400" /> My Digital Wallet
                       </button>
 
-                      <button
-                        onClick={() => {
-                          setActiveTab('organizer');
-                          setShowUserMenu(false);
-                        }}
-                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl flex items-center gap-2 font-medium"
-                      >
-                        <LayoutDashboard className="w-4 h-4 text-accent-400" /> Host Dashboard
-                      </button>
+                      {isOrganizer && (
+                        <button
+                          onClick={() => {
+                            setActiveTab('organizer');
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl flex items-center gap-2 font-medium"
+                        >
+                          <LayoutDashboard className="w-4 h-4 text-accent-400" /> Host Dashboard
+                        </button>
+                      )}
                     </div>
 
                     <div className="pt-1 border-t border-slate-800">
@@ -177,6 +207,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                         onClick={() => {
                           logoutUser();
                           setShowUserMenu(false);
+                          setActiveTab('auth');
                         }}
                         className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-xl flex items-center gap-2 font-bold"
                       >
@@ -188,8 +219,12 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
               </div>
             ) : (
               <button
-                onClick={() => setActiveModal('auth')}
-                className="ml-2 bg-dark-800 hover:bg-slate-800 text-brand-400 border border-brand-500/40 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all"
+                onClick={() => setActiveTab('auth')}
+                className={`ml-2 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl flex items-center gap-1.5 transition-all ${
+                  activeTab === 'auth'
+                    ? 'bg-brand-500 text-dark-900 shadow-md'
+                    : 'bg-dark-800 hover:bg-slate-800 text-brand-400 border border-brand-500/40'
+                }`}
               >
                 <LogIn className="w-4 h-4" />
                 <span>Sign In</span>
