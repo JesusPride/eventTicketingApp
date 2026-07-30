@@ -1,5 +1,5 @@
 import React from 'react';
-import { Ticket, ShieldCheck, QrCode, MapPin, Sparkles, ArrowRight } from 'lucide-react';
+import { Ticket, QrCode, MapPin, Sparkles, ArrowRight } from 'lucide-react';
 import { useEventContext } from '../context/EventContext';
 
 export const HeroBanner = ({ setActiveTab }) => {
@@ -7,7 +7,7 @@ export const HeroBanner = ({ setActiveTab }) => {
   const featuredEvent = events.find(e => e.featured) || events[0];
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-dark-800 via-slate-900 to-dark-900 border border-slate-800 shadow-2xl p-6 sm:p-10 mb-10">
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-dark-800 via-slate-900 to-dark-900 border border-slate-800/80 shadow-2xl p-6 sm:p-10 mb-10">
       {/* Glow Effects */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-brand-500/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/3 -ml-20 -mb-20 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -18,7 +18,7 @@ export const HeroBanner = ({ setActiveTab }) => {
         <div className="lg:col-span-7 space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-semibold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-            3MTT NextGen Capstone Project by Adewunmi Esther Opeyemi
+            3MTT Capstone by Adewunmi Esther Opeyemi
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
@@ -26,7 +26,7 @@ export const HeroBanner = ({ setActiveTab }) => {
           </h1>
 
           <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-normal max-w-2xl">
-            Streamline your event entry with automated ticket generation in Naira (₦), real-time gate scanner verification, and organizer revenue insights. Built specifically to eliminate duplicate ticket fraud across Nigeria.
+            Streamline event entry with automated ticket generation in Naira (₦), real-time gate scanner verification, and instant attendee verification across Nigeria.
           </p>
 
           {/* Quick Metrics */}
@@ -97,7 +97,7 @@ export const HeroBanner = ({ setActiveTab }) => {
                 <div className="flex items-center justify-between pt-2 border-t border-slate-800">
                   <span className="text-xs text-slate-400">Starting from</span>
                   <span className="text-lg font-extrabold text-brand-400">
-                    ₦{featuredEvent.tickets[0].price.toLocaleString()}
+                    ₦{featuredEvent.tickets && featuredEvent.tickets.length > 0 ? featuredEvent.tickets[0].price.toLocaleString() : '0'}
                   </span>
                 </div>
               </div>

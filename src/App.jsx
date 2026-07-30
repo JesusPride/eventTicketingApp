@@ -11,8 +11,9 @@ import { EventModal } from './components/EventModal';
 import { TicketBookingModal } from './components/TicketBookingModal';
 import { TicketPassModal } from './components/TicketPassModal';
 import { CreateEventModal } from './components/CreateEventModal';
+import { SqliteConsoleModal } from './components/SqliteConsoleModal';
 import { Toast } from './components/Toast';
-import { Ticket, Heart, ShieldCheck } from 'lucide-react';
+import { Ticket } from 'lucide-react';
 
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState('explore');
@@ -38,6 +39,7 @@ const AppContent = () => {
       {activeModal === 'booking' && <TicketBookingModal />}
       {activeModal === 'ticketPass' && <TicketPassModal />}
       {activeModal === 'createEvent' && <CreateEventModal />}
+      {activeModal === 'sqliteConsole' && <SqliteConsoleModal />}
 
       {/* Global Toast */}
       <Toast />

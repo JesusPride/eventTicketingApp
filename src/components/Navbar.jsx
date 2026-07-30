@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Ticket, ScanLine, LayoutDashboard, Sparkles, Search, PlusCircle, RefreshCw, LogIn, LogOut, UserCheck, Building2, ShieldCheck } from 'lucide-react';
+import { Ticket, ScanLine, LayoutDashboard, Sparkles, Search, PlusCircle, RefreshCw, LogIn, LogOut } from 'lucide-react';
 import { useEventContext } from '../context/EventContext';
 
 export const Navbar = ({ activeTab, setActiveTab }) => {
@@ -64,7 +64,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
           {/* Navigation Links */}
           <nav className="flex items-center gap-1 sm:gap-2">
             
-            {/* Explore Link (Visible to All) */}
+            {/* Explore Link */}
             <button
               onClick={() => setActiveTab('explore')}
               className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
@@ -77,7 +77,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
               <span className="hidden sm:inline">Explore</span>
             </button>
 
-            {/* My Tickets Link (Visible to All) */}
+            {/* My Tickets Link */}
             <button
               onClick={() => setActiveTab('my-tickets')}
               className={`relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
@@ -95,7 +95,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
               )}
             </button>
 
-            {/* Organizer & Gatekeeper Only Navigation Links */}
+            {/* Organizer Links */}
             {isOrganizer && (
               <>
                 <button
@@ -165,7 +165,6 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                           {currentUser.role} Mode
                         </span>
 
-                        {/* Switch Role Quick Button */}
                         <button
                           onClick={() => {
                             quickDemoLogin(isOrganizer ? 'attendee' : 'organizer');

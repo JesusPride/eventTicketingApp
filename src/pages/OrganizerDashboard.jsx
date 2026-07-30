@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
-  DollarSign, 
   Ticket, 
-  Users, 
   PlusCircle, 
   ScanLine, 
   Download, 
   TrendingUp, 
   Building2, 
-  Calendar,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  MapPin
 } from 'lucide-react';
 import { formatNGN, formatDate } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
@@ -22,6 +20,7 @@ export const OrganizerDashboard = ({ setActiveTab }) => {
   const totalRevenue = tickets.reduce((sum, t) => sum + (t.ticketPrice || 0), 0);
   const totalTicketsSold = tickets.length;
   const verifiedCheckIns = checkIns.filter(c => c.status === 'VERIFIED').length;
+  const totalCities = new Set(events.map(e => e.city)).size;
 
   const handleExportCSV = () => {
     if (tickets.length === 0) {
@@ -57,7 +56,7 @@ export const OrganizerDashboard = ({ setActiveTab }) => {
             Host Event Management & Revenue
           </h1>
           <p className="text-sm text-slate-300">
-            Track ticket sales revenue in ₦ NGN, monitor live check-in rates, and export attendee rosters.
+            Track ticket sales revenue in ₦ NGN, monitor gate check-in turnout, and manage attendee rosters.
           </p>
         </div>
 
@@ -81,21 +80,21 @@ export const OrganizerDashboard = ({ setActiveTab }) => {
       </div>
 
       {/* Metrics Grid Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
         {/* Total Revenue */}
         <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Sales Revenue</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Revenue</span>
             <div className="p-2.5 bg-brand-500/10 text-brand-400 rounded-xl border border-brand-500/20">
               <TrendingUp className="w-5 h-5" />
             </div>
           </div>
-          <p className="text-3xl font-black text-brand-400">
+          <p className="text-2xl sm:text-3xl font-black text-brand-400">
             {formatNGN(totalRevenue)}
           </p>
           <p className="text-xs text-slate-400 flex items-center gap-1">
-            <span className="text-emerald-400 font-bold">+100%</span> verified digital transactions
+            <span className="text-emerald-400 font-bold">₦ NGN</span> local digital checkout
           </p>
         </div>
 
@@ -107,7 +106,7 @@ export const OrganizerDashboard = ({ setActiveTab }) => {
               <Ticket className="w-5 h-5" />
             </div>
           </div>
-          <p className="text-3xl font-black text-white">
+          <p className="text-2xl sm:text-3xl font-black text-white">
             {totalTicketsSold}
           </p>
           <p className="text-xs text-slate-400">
@@ -118,16 +117,32 @@ export const OrganizerDashboard = ({ setActiveTab }) => {
         {/* Gate Check-ins */}
         <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Verified Gate Scans</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Verified Scans</span>
             <div className="p-2.5 bg-accent-500/15 text-accent-400 rounded-xl border border-accent-500/30">
               <ScanLine className="w-5 h-5" />
             </div>
           </div>
-          <p className="text-3xl font-black text-accent-400">
+          <p className="text-2xl sm:text-3xl font-black text-accent-400">
             {verifiedCheckIns}
           </p>
           <p className="text-xs text-slate-400 flex items-center gap-1">
-            {totalTicketsSold > 0 ? Math.round((verifiedCheckIns / totalTicketsSold) * 100) : 0}% check-in turnout rate
+            {totalTicketsSold > 0 ? Math.round((verifiedCheckIns / totalTicketsSold) * 100) : 0}% gate turnout rate
+          </p>
+        </div>
+
+        {/* Active Cities */}
+        <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Cities</span>
+            <div className="p-2.5 bg-brand-500/10 text-brand-400 rounded-xl border border-brand-500/20">
+              <MapPin className="w-5 h-5" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-white">
+            {totalCities} Cities
+          </p>
+          <p className="text-xs text-slate-400">
+            Lagos, Abuja, Ibadan & more
           </p>
         </div>
 
@@ -154,9 +169,9 @@ export const OrganizerDashboard = ({ setActiveTab }) => {
             </thead>
             <tbody className="divide-y divide-slate-800">
               {events.map((evt) => {
-                const sold = evt.tickets.reduce((acc, t) => acc + t.soldQuantity, 0);
-                const totalCap = evt.tickets.reduce((acc, t) => acc + t.totalQuantity, 0);
-                const revenue = evt.tickets.reduce((acc, t) => acc + (t.price * t.soldQuantity), 0);
+                const sold = evt.tickets ? evt.tickets.reduce((acc, t) => acc + t.soldQuantity, 0) : 0;
+                const totalCap = evt.tickets ? evt.tickets.reduce((acc, t) => acc + t.totalQuantity, 0) : 100;
+                const revenue = evt.tickets ? evt.tickets.reduce((acc, t) => acc + (t.price * t.soldQuantity), 0) : 0;
 
                 return (
                   <tr key={evt.id} className="hover:bg-slate-800/40 transition-colors">

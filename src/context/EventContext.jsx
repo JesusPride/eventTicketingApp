@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_EVENTS } from '../data/sampleEvents';
 import { 
-  getStoredEvents, 
-  saveEvents, 
-  getStoredTickets, 
-  saveTickets, 
-  getStoredCheckIns, 
-  saveCheckIns 
-} from '../utils/storage';
+  initSqliteDatabase, 
+  getEventsSql, 
+  insertEventSql, 
+  updateEventTicketsSql, 
+  getTicketsSql, 
+  insertTicketsBatchSql, 
+  markTicketUsedSql, 
+  getCheckInsSql, 
+  insertCheckInSql 
+} from '../services/sqlite';
 import { generateTicketId, generateQRPayload } from '../utils/formatters';
 
 const EventContext = createContext();
@@ -33,9 +36,10 @@ const DEMO_ORGANIZER = {
 };
 
 export const EventProvider = ({ children }) => {
-  const [events, setEvents] = useState(() => getStoredEvents(INITIAL_EVENTS));
-  const [tickets, setTickets] = useState(() => getStoredTickets());
-  const [checkIns, setCheckIns] = useState(() => getStoredCheckIns());
+  const [events, setEvents] = useState([]);
+  const [tickets, setTickets] = useState([]);
+  const [checkIns, setCheckIns] = useState([]);
+  const [isSqliteReady, setIsSqliteReady] = useState(false);
 
   // User Auth State
   const [currentUser, setCurrentUser] = useState(() => {
@@ -54,7 +58,7 @@ export const EventProvider = ({ children }) => {
   const [priceFilter, setPriceFilter] = useState('All'); // All, Free, Paid
 
   // Modals & Active State
-  const [activeModal, setActiveModal] = useState(null); // 'booking', 'ticketPass', 'createEvent', 'qrScanner', 'auth'
+  const [activeModal, setActiveModal] = useState(null); // 'booking', 'ticketPass', 'createEvent', 'qrScanner', 'auth', 'sqliteConsole'
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedTicketPass, setSelectedTicketPass] = useState(null);
 
@@ -67,18 +71,36 @@ export const EventProvider = ({ children }) => {
 
   const hideToast = () => setToast(null);
 
-  // Save to localStorage when state updates
+  // Initialize SQLite Database Engine on startup
   useEffect(() => {
-    saveEvents(events);
-  }, [events]);
+    let isMounted = true;
+    const startDb = async () => {
+      try {
+        await initSqliteDatabase(INITIAL_EVENTS);
+        if (isMounted) {
+          refreshFromSqlite();
+          setIsSqliteReady(true);
+        }
+      } catch (err) {
+        console.error('Error starting SQLite database:', err);
+        // Fallback to sample events if initialization has temporary issue
+        if (isMounted) {
+          setEvents(INITIAL_EVENTS);
+        }
+      }
+    };
+    startDb();
+    return () => { isMounted = false; };
+  }, []);
 
-  useEffect(() => {
-    saveTickets(tickets);
-  }, [tickets]);
-
-  useEffect(() => {
-    saveCheckIns(checkIns);
-  }, [checkIns]);
+  const refreshFromSqlite = () => {
+    const evts = getEventsSql();
+    const tkts = getTicketsSql();
+    const chks = getCheckInsSql();
+    setEvents(evts.length > 0 ? evts : INITIAL_EVENTS);
+    setTickets(tkts);
+    setCheckIns(chks);
+  };
 
   useEffect(() => {
     if (currentUser) {
@@ -139,21 +161,19 @@ export const EventProvider = ({ children }) => {
     showToast('Signed out successfully', 'info');
   };
 
-  // Buy Ticket Handler
+  // Buy Ticket Handler (Writes to SQLite Database)
   const purchaseTicket = ({ event, ticketType, quantity, attendee }) => {
     const newTickets = [];
-    const updatedEvents = events.map(evt => {
-      if (evt.id === event.id) {
-        const updatedTicketTiers = evt.tickets.map(tier => {
-          if (tier.id === ticketType.id) {
-            return { ...tier, soldQuantity: tier.soldQuantity + quantity };
-          }
-          return tier;
-        });
-        return { ...evt, tickets: updatedTicketTiers };
+    
+    // Update local tier counts
+    const updatedTicketTiers = event.tickets.map(tier => {
+      if (tier.id === ticketType.id) {
+        return { ...tier, soldQuantity: tier.soldQuantity + quantity };
       }
-      return evt;
+      return tier;
     });
+
+    updateEventTicketsSql(event.id, updatedTicketTiers);
 
     for (let i = 0; i < quantity; i++) {
       const ticketId = generateTicketId();
@@ -181,14 +201,14 @@ export const EventProvider = ({ children }) => {
       });
     }
 
-    setEvents(updatedEvents);
-    setTickets(prev => [...newTickets, ...prev]);
+    insertTicketsBatchSql(newTickets);
+    refreshFromSqlite();
 
-    showToast(`Successfully purchased ${quantity} ticket(s) for ${event.title}!`, 'success');
+    showToast(`Successfully purchased ${quantity} ticket(s) saved to SQLite DB!`, 'success');
     return newTickets;
   };
 
-  // Create Event Handler
+  // Create Event Handler (Writes to SQLite Database)
   const addEvent = (newEventData) => {
     const newEvent = {
       id: `evt-${Date.now()}`,
@@ -196,11 +216,12 @@ export const EventProvider = ({ children }) => {
       featured: false,
       ...newEventData,
     };
-    setEvents(prev => [newEvent, ...prev]);
-    showToast('New event published successfully!', 'success');
+    insertEventSql(newEvent);
+    refreshFromSqlite();
+    showToast('New event published to SQLite DB!', 'success');
   };
 
-  // Gate Check-in Ticket Verification Handler
+  // Gate Check-in Ticket Verification Handler (Reads/Writes to SQLite)
   const verifyAndCheckInTicket = (ticketIdOrPayload) => {
     let cleanTicketId = ticketIdOrPayload.trim();
     
@@ -211,21 +232,20 @@ export const EventProvider = ({ children }) => {
       }
     } catch (e) {}
 
-    const ticketIndex = tickets.findIndex(t => t.id.toLowerCase() === cleanTicketId.toLowerCase());
+    const ticket = tickets.find(t => t.id.toLowerCase() === cleanTicketId.toLowerCase());
 
-    if (ticketIndex === -1) {
+    if (!ticket) {
       const failedLog = {
         id: `chk-${Date.now()}`,
         ticketId: cleanTicketId,
         timestamp: new Date().toISOString(),
         status: 'INVALID',
-        message: 'Ticket ID not found in system database.'
+        message: 'Ticket ID not found in system SQLite database.'
       };
-      setCheckIns(prev => [failedLog, ...prev]);
-      return { success: false, status: 'INVALID', message: '❌ Invalid Ticket: Ticket ID not recognized!' };
+      insertCheckInSql(failedLog);
+      refreshFromSqlite();
+      return { success: false, status: 'INVALID', message: '❌ Invalid Ticket: Ticket ID not recognized in SQLite!' };
     }
-
-    const ticket = tickets[ticketIndex];
 
     if (ticket.isUsed) {
       const duplicateLog = {
@@ -238,7 +258,8 @@ export const EventProvider = ({ children }) => {
         status: 'DUPLICATE',
         message: `Already used on ${new Date(ticket.usedAt).toLocaleTimeString()}`
       };
-      setCheckIns(prev => [duplicateLog, ...prev]);
+      insertCheckInSql(duplicateLog);
+      refreshFromSqlite();
       return { 
         success: false, 
         status: 'DUPLICATE', 
@@ -248,12 +269,7 @@ export const EventProvider = ({ children }) => {
     }
 
     const nowIso = new Date().toISOString();
-    const updatedTickets = [...tickets];
-    updatedTickets[ticketIndex] = {
-      ...ticket,
-      isUsed: true,
-      usedAt: nowIso
-    };
+    markTicketUsedSql(ticket.id, nowIso);
 
     const successLog = {
       id: `chk-${Date.now()}`,
@@ -266,24 +282,17 @@ export const EventProvider = ({ children }) => {
       message: 'Access Granted'
     };
 
-    setTickets(updatedTickets);
-    setCheckIns(prev => [successLog, ...prev]);
+    insertCheckInSql(successLog);
+    refreshFromSqlite();
+
+    const updatedTicket = { ...ticket, isUsed: true, usedAt: nowIso };
 
     return {
       success: true,
       status: 'VERIFIED',
-      ticket: updatedTickets[ticketIndex],
+      ticket: updatedTicket,
       message: `✅ ACCESS GRANTED! Welcome ${ticket.attendeeName} (${ticket.ticketTypeName})`
     };
-  };
-
-  const resetDemoData = () => {
-    setEvents(INITIAL_EVENTS);
-    setTickets([]);
-    setCheckIns([]);
-    setCurrentUser(DEFAULT_USER);
-    localStorage.clear();
-    showToast('Demo data reset to default state.', 'info');
   };
 
   return (
@@ -293,6 +302,8 @@ export const EventProvider = ({ children }) => {
         tickets,
         checkIns,
         currentUser,
+        isSqliteReady,
+        refreshFromSqlite,
         loginUser,
         quickDemoLogin,
         signupUser,
@@ -314,7 +325,6 @@ export const EventProvider = ({ children }) => {
         purchaseTicket,
         addEvent,
         verifyAndCheckInTicket,
-        resetDemoData,
         toast,
         showToast,
         hideToast,
