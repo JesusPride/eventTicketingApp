@@ -1,17 +1,13 @@
-# Dependencies
 node_modules
 .pnpm-store
 
-# Production build output
 dist
 dist-ssr
 
-# Local environment & log files
 .env
 .env.local
 .env.*.local
 *.log
 
-# System files
 .DS_Store
 Thumbs.db
