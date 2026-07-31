@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Ticket, 
   PlusCircle, 
@@ -8,13 +8,16 @@ import {
   Building2, 
   CheckCircle,
   AlertTriangle,
-  MapPin
+  MapPin,
+  Database,
+  Users
 } from 'lucide-react';
 import { formatNGN, formatDate } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const OrganizerDashboard = ({ setActiveTab }) => {
   const { events, tickets, checkIns, setActiveModal, showToast } = useEventContext();
+  const [activeRosterTab, setActiveRosterTab] = useState('events'); // 'events' or 'attendees'
 
   // Calculate Metrics
   const totalRevenue = tickets.reduce((sum, t) => sum + (t.ticketPrice || 0), 0);
@@ -61,6 +64,15 @@ export const OrganizerDashboard = ({ setActiveTab }) => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => setActiveModal('sqliteConsole')}
+            className="px-4 py-2.5 bg-dark-800 hover:bg-slate-800 text-slate-300 hover:text-white font-semibold text-xs sm:text-sm rounded-xl border border-slate-700 flex items-center gap-2 transition-all"
+            title="Open Developer SQLite Database Console (Shortcut: Cmd/Ctrl + Shift + S)"
+          >
+            <Database className="w-4 h-4 text-purple-400" />
+            <span>SQLite Console</span>
+          </button>
+
           <button
             onClick={handleExportCSV}
             className="px-4 py-2.5 bg-dark-800 hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-xs sm:text-sm rounded-xl border border-slate-700 flex items-center gap-2 transition-all"
@@ -148,122 +160,153 @@ export const OrganizerDashboard = ({ setActiveTab }) => {
 
       </div>
 
-      {/* Hosted Events Overview Table */}
-      <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <h3 className="font-bold text-white text-base">Hosted Events Performance</h3>
-          <span className="text-xs text-slate-400 font-semibold">{events.length} Events Published</span>
-        </div>
+      {/* Navigation Sub-Tabs: Hosted Events vs Ticket Buyers Roster */}
+      <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+        <button
+          onClick={() => setActiveRosterTab('events')}
+          className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+            activeRosterTab === 'events'
+              ? 'bg-brand-500 text-dark-900 shadow-md'
+              : 'bg-dark-800 text-slate-300 hover:bg-slate-800'
+          }`}
+        >
+          <Building2 className="w-4 h-4" />
+          <span>Hosted Events Performance ({events.length})</span>
+        </button>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-dark-800/80 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
-              <tr>
-                <th className="py-3 px-4">Event Title</th>
-                <th className="py-3 px-4">City</th>
-                <th className="py-3 px-4">Date</th>
-                <th className="py-3 px-4">Tickets Sold / Cap</th>
-                <th className="py-3 px-4">Est. Revenue</th>
-                <th className="py-3 px-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800">
-              {events.map((evt) => {
-                const sold = evt.tickets ? evt.tickets.reduce((acc, t) => acc + t.soldQuantity, 0) : 0;
-                const totalCap = evt.tickets ? evt.tickets.reduce((acc, t) => acc + t.totalQuantity, 0) : 100;
-                const revenue = evt.tickets ? evt.tickets.reduce((acc, t) => acc + (t.price * t.soldQuantity), 0) : 0;
-
-                return (
-                  <tr key={evt.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-bold text-white">
-                      {evt.title}
-                    </td>
-                    <td className="py-3.5 px-4 font-medium text-slate-300">
-                      {evt.city}
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-400">
-                      {formatDate(evt.date)}
-                    </td>
-                    <td className="py-3.5 px-4 font-semibold text-slate-200">
-                      {sold} / {totalCap}
-                    </td>
-                    <td className="py-3.5 px-4 font-black text-brand-400">
-                      {formatNGN(revenue)}
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <button
-                        onClick={() => setActiveTab('gate-scanner')}
-                        className="px-3 py-1 bg-accent-500/10 hover:bg-accent-500/20 text-accent-400 font-bold rounded-lg border border-accent-500/30 transition-colors"
-                      >
-                        Gate Scanner
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <button
+          onClick={() => setActiveRosterTab('attendees')}
+          className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+            activeRosterTab === 'attendees'
+              ? 'bg-brand-500 text-dark-900 shadow-md'
+              : 'bg-dark-800 text-slate-300 hover:bg-slate-800'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>Recent Ticket Buyers Roster ({tickets.length})</span>
+        </button>
       </div>
 
-      {/* Attendee Roster Table */}
-      <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div>
-            <h3 className="font-bold text-white text-base">Recent Ticket Buyers Roster</h3>
-            <p className="text-xs text-slate-400">Real-time purchaser log & QR status</p>
+      {/* Tab 1: Hosted Events Overview Table */}
+      {activeRosterTab === 'events' && (
+        <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4 animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <h3 className="font-bold text-white text-base">Hosted Events Performance</h3>
+            <span className="text-xs text-slate-400 font-semibold">{events.length} Events Published</span>
           </div>
-          <button
-            onClick={handleExportCSV}
-            className="text-xs text-brand-400 hover:text-brand-300 font-bold flex items-center gap-1"
-          >
-            <Download className="w-3.5 h-3.5" /> Download Full CSV
-          </button>
-        </div>
 
-        {tickets.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-xs">
-            No tickets purchased yet. Buy a ticket from the Explore tab to see real-time attendee data populating here!
-          </div>
-        ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-dark-800/80 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Ticket ID</th>
-                  <th className="py-3 px-4">Attendee Name</th>
-                  <th className="py-3 px-4">Event</th>
-                  <th className="py-3 px-4">Tier</th>
-                  <th className="py-3 px-4">Amount</th>
-                  <th className="py-3 px-4">Gate Status</th>
+                  <th className="py-3 px-4">Event Title</th>
+                  <th className="py-3 px-4">City</th>
+                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-4">Tickets Sold / Cap</th>
+                  <th className="py-3 px-4">Est. Revenue</th>
+                  <th className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
-                {tickets.map((t) => (
-                  <tr key={t.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-brand-400">{t.id}</td>
-                    <td className="py-3 px-4 font-semibold text-white">{t.attendeeName}</td>
-                    <td className="py-3 px-4 text-slate-300 truncate max-w-[200px]">{t.eventTitle}</td>
-                    <td className="py-3 px-4">{t.ticketTypeName}</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">{formatNGN(t.ticketPrice)}</td>
-                    <td className="py-3 px-4">
-                      {t.isUsed ? (
-                        <span className="inline-flex items-center gap-1 font-bold text-amber-400">
-                          <AlertTriangle className="w-3 h-3" /> Checked In
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 font-bold text-emerald-400">
-                          <CheckCircle className="w-3 h-3" /> Active
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {events.map((evt) => {
+                  const sold = evt.tickets ? evt.tickets.reduce((acc, t) => acc + t.soldQuantity, 0) : 0;
+                  const totalCap = evt.tickets ? evt.tickets.reduce((acc, t) => acc + t.totalQuantity, 0) : 100;
+                  const revenue = evt.tickets ? evt.tickets.reduce((acc, t) => acc + (t.price * t.soldQuantity), 0) : 0;
+
+                  return (
+                    <tr key={evt.id} className="hover:bg-slate-800/40 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-white">
+                        {evt.title}
+                      </td>
+                      <td className="py-3.5 px-4 font-medium text-slate-300">
+                        {evt.city}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-400">
+                        {formatDate(evt.date)}
+                      </td>
+                      <td className="py-3.5 px-4 font-semibold text-slate-200">
+                        {sold} / {totalCap}
+                      </td>
+                      <td className="py-3.5 px-4 font-black text-brand-400">
+                        {formatNGN(revenue)}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <button
+                          onClick={() => setActiveTab('gate-scanner')}
+                          className="px-3 py-1 bg-accent-500/10 hover:bg-accent-500/20 text-accent-400 font-bold rounded-lg border border-accent-500/30 transition-colors"
+                        >
+                          Gate Scanner
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Tab 2: Attendee Roster Table */}
+      {activeRosterTab === 'attendees' && (
+        <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4 animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div>
+              <h3 className="font-bold text-white text-base">Recent Ticket Buyers Roster</h3>
+              <p className="text-xs text-slate-400">Real-time purchaser log & QR status</p>
+            </div>
+            <button
+              onClick={handleExportCSV}
+              className="text-xs text-brand-400 hover:text-brand-300 font-bold flex items-center gap-1"
+            >
+              <Download className="w-3.5 h-3.5" /> Download Full CSV
+            </button>
+          </div>
+
+          {tickets.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 text-xs">
+              No tickets purchased yet. Buy a ticket from the Explore tab to see real-time attendee data populating here!
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-300">
+                <thead className="bg-dark-800/80 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
+                  <tr>
+                    <th className="py-3 px-4">Ticket ID</th>
+                    <th className="py-3 px-4">Attendee Name</th>
+                    <th className="py-3 px-4">Event</th>
+                    <th className="py-3 px-4">Tier</th>
+                    <th className="py-3 px-4">Amount</th>
+                    <th className="py-3 px-4">Gate Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                  {tickets.map((t) => (
+                    <tr key={t.id} className="hover:bg-slate-800/40 transition-colors">
+                      <td className="py-3 px-4 font-mono font-bold text-brand-400">{t.id}</td>
+                      <td className="py-3 px-4 font-semibold text-white">{t.attendeeName}</td>
+                      <td className="py-3 px-4 text-slate-300 truncate max-w-[200px]">{t.eventTitle}</td>
+                      <td className="py-3 px-4">{t.ticketTypeName}</td>
+                      <td className="py-3 px-4 font-bold text-slate-200">{formatNGN(t.ticketPrice)}</td>
+                      <td className="py-3 px-4">
+                        {t.isUsed ? (
+                          <span className="inline-flex items-center gap-1 font-bold text-amber-400">
+                            <AlertTriangle className="w-3 h-3" /> Checked In
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 font-bold text-emerald-400">
+                            <CheckCircle className="w-3 h-3" /> Active
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
     </div>
   );

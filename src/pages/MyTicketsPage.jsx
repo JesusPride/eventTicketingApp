@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Ticket, QrCode, Calendar, MapPin, CheckCircle, AlertTriangle, Printer, Sparkles, ShoppingBag } from 'lucide-react';
+import { Ticket, QrCode, Calendar, MapPin, CheckCircle, AlertTriangle, ShoppingBag } from 'lucide-react';
 import { formatDate, formatNGN } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
@@ -19,7 +19,7 @@ export const MyTicketsPage = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn max-w-5xl mx-auto">
+    <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto">
       
       {/* Header Banner */}
       <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 bg-gradient-to-r from-dark-800 via-slate-900 to-dark-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -38,7 +38,7 @@ export const MyTicketsPage = ({ setActiveTab }) => {
 
         <button
           onClick={() => setActiveTab('explore')}
-          className="bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm px-5 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20 transition-all self-start md:self-auto"
+          className="bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm px-5 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20 transition-all self-start md:self-auto shrink-0"
         >
           <ShoppingBag className="w-4 h-4" />
           Explore More Events
@@ -81,7 +81,7 @@ export const MyTicketsPage = ({ setActiveTab }) => {
         </button>
       </div>
 
-      {/* Ticket List Cards */}
+      {/* Ticket List Cards Grid (3 in a row on desktop) */}
       {filteredTickets.length === 0 ? (
         <div className="glass-card p-12 rounded-3xl border border-slate-800 text-center space-y-4 max-w-lg mx-auto">
           <Ticket className="w-12 h-12 text-slate-600 mx-auto" />
@@ -99,7 +99,7 @@ export const MyTicketsPage = ({ setActiveTab }) => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTickets.map((ticket) => (
             <div
               key={ticket.id}
@@ -174,7 +174,7 @@ export const MyTicketsPage = ({ setActiveTab }) => {
 
                 <button
                   onClick={() => handleOpenPass(ticket)}
-                  className="bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-md transition-all"
+                  className="bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-md transition-all shrink-0"
                 >
                   <QrCode className="w-4 h-4" />
                   View QR Pass

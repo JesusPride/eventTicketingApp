@@ -1,45 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { X, Ticket, User, Mail, Phone, CreditCard, ShieldCheck, Sparkles, CheckCircle, Upload, Camera, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Ticket, User, Mail, Phone, CreditCard, CheckCircle, Upload, Camera, Trash2, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { formatNGN } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const TicketBookingModal = () => {
-  const { selectedEvent, setActiveModal, setSelectedTicketPass, purchaseTicket, currentUser } = useEventContext();
+  const { selectedEvent, setActiveModal, setSelectedTicketPass, purchaseTicket, showToast } = useEventContext();
 
   if (!selectedEvent) return null;
 
   const [selectedTier, setSelectedTier] = useState(selectedEvent.tickets[0]);
   const [quantity, setQuantity] = useState(1);
   const [attendee, setAttendee] = useState({
-    name: currentUser ? currentUser.name : 'Adewunmi Esther Opeyemi',
-    email: currentUser ? currentUser.email : 'esther.3mtt@example.com',
-    phone: currentUser?.phone || '08123456789',
-    avatar: currentUser?.avatar || '',
+    name: '',
+    email: '',
+    phone: '',
+    avatar: '',
   });
   const [isProcessing, setIsProcessing] = useState(false);
-
-  useEffect(() => {
-    if (currentUser) {
-      setAttendee(prev => ({
-        ...prev,
-        name: currentUser.name,
-        email: currentUser.email,
-        phone: currentUser.phone || prev.phone,
-        avatar: currentUser.avatar || prev.avatar,
-      }));
-    }
-  }, [currentUser]);
+  const [photoError, setPhotoError] = useState(false);
 
   const totalPrice = selectedTier ? selectedTier.price * quantity : 0;
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Image file size must be less than 5MB');
+      // 1MB Lightweight Image Size Limit
+      if (file.size > 1 * 1024 * 1024) {
+        showToast('Image file size must be less than 1MB. Please upload a lighter photo.', 'warning');
         return;
       }
+      setPhotoError(false);
       const reader = new FileReader();
       reader.onloadend = () => {
         setAttendee(prev => ({ ...prev, avatar: reader.result }));
@@ -50,6 +41,14 @@ export const TicketBookingModal = () => {
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
+
+    // Enforce mandatory passport photo upload requirement
+    if (!attendee.avatar) {
+      setPhotoError(true);
+      showToast('Please upload a passport photo before generating your ticket.', 'warning');
+      return;
+    }
+
     setIsProcessing(true);
 
     setTimeout(() => {
@@ -67,9 +66,13 @@ export const TicketBookingModal = () => {
       });
 
       setIsProcessing(false);
-      
+
       if (createdTickets && createdTickets.length > 0) {
-        setSelectedTicketPass(createdTickets[0]);
+        // Tag ticket pass with isJustPurchased: true for post-checkout congratulations!
+        setSelectedTicketPass({
+          ...createdTickets[0],
+          isJustPurchased: true,
+        });
         setActiveModal('ticketPass');
       } else {
         setActiveModal(null);
@@ -80,7 +83,7 @@ export const TicketBookingModal = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-900/80 backdrop-blur-md animate-fadeIn">
       <div className="relative w-full max-w-xl glass-modal rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl max-h-[92vh] flex flex-col">
-        
+
         {/* Modal Header */}
         <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-dark-900/90">
           <div>
@@ -97,7 +100,7 @@ export const TicketBookingModal = () => {
 
         {/* Form Body */}
         <form onSubmit={handleBookingSubmit} className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-200">
-          
+
           {/* Step 1: Select Ticket Tier */}
           <div className="space-y-3">
             <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -167,32 +170,38 @@ export const TicketBookingModal = () => {
             </div>
           </div>
 
-          {/* Step 3: Attendee Details & Avatar Upload */}
+          {/* Step 3: Attendee Details & Mandatory Photo Upload */}
           <div className="space-y-4">
             <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-              3. Attendee Information & Ticket Photo
+              3. Attendee Information & Passport Photo
             </label>
 
             {/* Custom Photo Upload Box */}
-            <div className="p-4 bg-dark-800/90 rounded-2xl border border-slate-700/80 space-y-3">
-              <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <Camera className="w-4 h-4 text-brand-400" />
-                Ticket Pass Photo (Auto-filled from profile or upload new)
-              </span>
+            <div className={`p-4 bg-dark-800/90 rounded-2xl border space-y-3 transition-all ${
+              photoError ? 'border-rose-500/80 bg-rose-950/20' : 'border-slate-700/80'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-brand-400" />
+                  Upload Passport Photo <span className="text-rose-400 font-bold">*Required (Max 1MB)</span>
+                </span>
+              </div>
 
               <div className="flex items-center gap-4">
-                <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-purple-500/40 bg-purple-950/60 shrink-0 flex items-center justify-center">
+                <div className={`relative w-16 h-16 rounded-2xl overflow-hidden border-2 bg-purple-950/60 shrink-0 flex items-center justify-center ${
+                  photoError ? 'border-rose-500' : 'border-purple-500/40'
+                }`}>
                   {attendee.avatar ? (
-                    <img src={attendee.avatar} alt="Uploaded Avatar" className="w-full h-full object-cover" />
+                    <img src={attendee.avatar} alt="Uploaded Passport" className="w-full h-full object-cover" />
                   ) : (
                     <User className="w-8 h-8 text-slate-500" />
                   )}
                 </div>
 
                 <div className="flex-1 space-y-2">
-                  <label className="inline-flex items-center gap-2 px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl cursor-pointer transition-colors shadow-md">
+                  <label className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl cursor-pointer transition-colors shadow-md">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>{attendee.avatar ? 'Change Photo' : 'Upload Your Image'}</span>
+                    <span>Upload Passport Photo</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -200,6 +209,12 @@ export const TicketBookingModal = () => {
                       className="hidden"
                     />
                   </label>
+
+                  {photoError && (
+                    <p className="text-[11px] text-rose-400 font-semibold flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> Passport photo is required before generating ticket.
+                    </p>
+                  )}
 
                   {attendee.avatar && (
                     <button
@@ -220,7 +235,7 @@ export const TicketBookingModal = () => {
                 <input
                   type="text"
                   required
-                  placeholder="Full Name"
+                  placeholder="Enter your Full Name"
                   value={attendee.name}
                   onChange={(e) => setAttendee({ ...attendee, name: e.target.value })}
                   className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
@@ -232,7 +247,7 @@ export const TicketBookingModal = () => {
                 <input
                   type="email"
                   required
-                  placeholder="Email Address"
+                  placeholder="Enter your Email Address"
                   value={attendee.email}
                   onChange={(e) => setAttendee({ ...attendee, email: e.target.value })}
                   className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
@@ -244,7 +259,7 @@ export const TicketBookingModal = () => {
                 <input
                   type="tel"
                   required
-                  placeholder="Phone Number (e.g. 08123456789)"
+                  placeholder="Enter your Phone Number"
                   value={attendee.phone}
                   onChange={(e) => setAttendee({ ...attendee, phone: e.target.value })}
                   className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
@@ -282,7 +297,7 @@ export const TicketBookingModal = () => {
             ) : (
               <>
                 <CreditCard className="w-5 h-5" />
-                Confirm & Issue Ticket ({formatNGN(totalPrice)})
+                Generate My Ticket ({formatNGN(totalPrice)})
               </>
             )}
           </button>

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EventProvider, useEventContext } from './context/EventContext';
 import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
 import { ExplorePage } from './pages/ExplorePage';
 import { MyTicketsPage } from './pages/MyTicketsPage';
 import { GateCheckInPage } from './pages/GateCheckInPage';
@@ -13,11 +14,22 @@ import { TicketPassModal } from './components/TicketPassModal';
 import { CreateEventModal } from './components/CreateEventModal';
 import { SqliteConsoleModal } from './components/SqliteConsoleModal';
 import { Toast } from './components/Toast';
-import { Ticket } from 'lucide-react';
 
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState('explore');
-  const { activeModal } = useEventContext();
+  const { activeModal, setActiveModal } = useEventContext();
+
+  // Developer Keyboard Shortcut (Cmd/Ctrl + Shift + S) to open SQLite console
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        setActiveModal(prev => (prev === 'sqliteConsole' ? null : 'sqliteConsole'));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setActiveModal]);
 
   return (
     <div className="min-h-screen bg-dark-900 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-dark-900">
@@ -44,19 +56,8 @@ const AppContent = () => {
       {/* Global Toast */}
       <Toast />
 
-      {/* Footer Credentials */}
-      <footer className="border-t border-slate-800/80 bg-dark-950 py-8 px-4 text-center text-xs text-slate-400 space-y-3">
-        <div className="flex items-center justify-center gap-2">
-          <Ticket className="w-4 h-4 text-brand-500" />
-          <span className="font-extrabold text-white text-sm">Event<span className="text-gradient">Pulse</span> Nigeria</span>
-        </div>
-        <p className="max-w-xl mx-auto text-slate-400 leading-relaxed">
-          Submitted for the <strong className="text-white">3MTT NextGen Programme Graduation</strong> by <strong className="text-brand-400">Adewunmi Esther Opeyemi</strong>. Designed to solve local Nigerian event ticketing challenges with dynamic QR codes & instant gate verification.
-        </p>
-        <p className="text-[11px] text-slate-500 font-mono">
-          Submission Deadline: 31 July 2026 • Build Version 1.0.0 (Vite + React + Tailwind CSS)
-        </p>
-      </footer>
+      {/* Real Modern Web Footer Component */}
+      <Footer setActiveTab={setActiveTab} />
 
     </div>
   );

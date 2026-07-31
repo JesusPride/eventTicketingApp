@@ -1,20 +1,15 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { X, Calendar, MapPin, Ticket, ShieldCheck, Printer, CheckCircle, AlertTriangle, Github } from 'lucide-react';
+import { X, Ticket, ShieldCheck, CheckCircle, AlertTriangle, Mail } from 'lucide-react';
 import { formatDate, formatNGN } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const TicketPassModal = () => {
-  const { selectedTicketPass, setActiveModal, showToast } = useEventContext();
-  const printRef = useRef(null);
+  const { selectedTicketPass, setActiveModal } = useEventContext();
 
   if (!selectedTicketPass) return null;
 
-  const handlePrint = () => {
-    window.print();
-  };
-
-  // Attendee Avatar (Default photo or user photo)
+  // Attendee Avatar (Default photo or user uploaded photo)
   const attendeeAvatar = selectedTicketPass.attendeeAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
 
   return (
@@ -33,26 +28,29 @@ export const TicketPassModal = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-dark-800 hover:bg-slate-800 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors shadow-sm"
-            >
-              <Printer className="w-4 h-4 text-brand-400" />
-              <span>Print Ticket</span>
-            </button>
-            <button
-              onClick={() => setActiveModal(null)}
-              className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+          <button
+            onClick={() => setActiveModal(null)}
+            className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Printable Ticket Container */}
-        <div ref={printRef} className="p-4 sm:p-8 overflow-y-auto space-y-6 bg-dark-950 text-slate-100 flex flex-col items-center justify-center">
+        {/* Digital Ticket Container */}
+        <div className="p-4 sm:p-8 overflow-y-auto space-y-6 bg-dark-950 text-slate-100 flex flex-col items-center justify-center">
           
+          {/* Email Confirmation Congratulatory Banner (Shown ONLY on brand new ticket purchase!) */}
+          {selectedTicketPass.isJustPurchased && (
+            <div className="w-full max-w-[650px] p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-brand-950/80 via-slate-900 to-emerald-950/80 border border-brand-500/40 text-center space-y-1.5 shadow-xl animate-fadeIn">
+              <h3 className="text-base sm:text-lg font-extrabold text-white">
+                Congrats, {selectedTicketPass.attendeeName}! Your ticket is ready. 🎉
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                We've emailed your ticket to <strong className="text-brand-300 font-mono underline">{selectedTicketPass.attendeeEmail}</strong> and will send updates in the run up to the event.
+              </p>
+            </div>
+          )}
+
           {/* SVG Ticket Container with Exact pattern-ticket.svg Backdrop */}
           <div className="relative w-full max-w-[650px] aspect-[600/280] rounded-3xl overflow-hidden shadow-2xl filter drop-shadow-2xl flex items-center">
             
@@ -115,10 +113,8 @@ export const TicketPassModal = () => {
                     </h3>
                     
                     <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-mono text-purple-200/80">
-                      <Github className="w-3 h-3 text-purple-400 shrink-0" />
-                      <span className="font-semibold">@Jesuspride</span>
-                      <span className="hidden sm:inline text-slate-400">•</span>
-                      <span className="hidden sm:inline truncate max-w-[130px]">{selectedTicketPass.attendeeEmail}</span>
+                      <Mail className="w-3 h-3 text-purple-400 shrink-0" />
+                      <span className="truncate max-w-[170px] font-semibold">{selectedTicketPass.attendeeEmail}</span>
                     </div>
 
                     <div className="flex items-center gap-1.5 pt-0.5">
@@ -179,7 +175,7 @@ export const TicketPassModal = () => {
           {/* Gate Verification Footer Notice */}
           <div className="flex items-center justify-center gap-2 text-center text-xs text-slate-400 pt-2">
             <ShieldCheck className="w-4 h-4 text-brand-400" />
-            <span>Present this ticket pass on your mobile device or printed copy at venue gate.</span>
+            <span>Present this ticket pass on your mobile device at venue gate.</span>
           </div>
 
         </div>

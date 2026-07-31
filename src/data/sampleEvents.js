@@ -1,7 +1,7 @@
 export const INITIAL_EVENTS = [
   {
     id: 'evt-001',
-    title: 'Lagos Tech Fest & NextGen AI Summit 2026',
+    title: 'Lagos Tech Fest 2026',
     organizer: '3MTT Lagos Chapter & TechNation',
     category: 'Tech',
     city: 'Lagos',
@@ -19,7 +19,7 @@ export const INITIAL_EVENTS = [
   },
   {
     id: 'evt-002',
-    title: 'Afrobeats Night & Beach Concert Eko',
+    title: 'Afrobeats Beach Fest',
     organizer: 'Eko Live & Vibes Entertainment',
     category: 'Music',
     city: 'Lagos',
@@ -37,7 +37,7 @@ export const INITIAL_EVENTS = [
   },
   {
     id: 'evt-003',
-    title: '3MTT NextGen Developers Graduation Summit',
+    title: '3MTT Graduation Summit',
     organizer: 'NITDA & 3MTT Nigeria',
     category: 'Education',
     city: 'Abuja',
@@ -54,7 +54,7 @@ export const INITIAL_EVENTS = [
   },
   {
     id: 'evt-004',
-    title: 'Ibadan Digital Economy & Startup Expo',
+    title: 'Ibadan Startup Expo',
     organizer: 'Oyo State Tech Hubs Network',
     category: 'Business',
     city: 'Ibadan',
@@ -71,7 +71,7 @@ export const INITIAL_EVENTS = [
   },
   {
     id: 'evt-005',
-    title: 'Port Harcourt International Food & Culture Fest',
+    title: 'Port Harcourt Food Fest',
     organizer: 'Garden City Culinary Association',
     category: 'Food & Drink',
     city: 'Port Harcourt',
@@ -82,13 +82,13 @@ export const INITIAL_EVENTS = [
     image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80',
     featured: false,
     tickets: [
-      { id: 't-reg', name: 'Foodie Pass (Includes 3 Tasting Coupons)', price: 7500, totalQuantity: 600, soldQuantity: 340 },
+      { id: 't-reg', name: 'Foodie Pass (3 Tasting)', price: 7500, totalQuantity: 600, soldQuantity: 340 },
       { id: 't-family', name: 'Family Pass (4 Persons)', price: 25000, totalQuantity: 100, soldQuantity: 58 },
     ]
   },
   {
     id: 'evt-006',
-    title: 'Mastering Modern Full-Stack Development (Online)',
+    title: 'Full-Stack Dev Workshop',
     organizer: '3MTT Masterclass Series',
     category: 'Virtual',
     city: 'Online',
