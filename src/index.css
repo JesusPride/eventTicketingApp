@@ -27,19 +27,281 @@
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #a7f3d0 100%);
+    background: linear-gradient(135deg, #008751 0%, #22C55E 50%, #16a34a 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .text-gradient-purple {
-    background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 50%, #e9d5ff 100%);
+    background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 50%, #6d28d9 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 }
 
-/* Custom Scrollbar */
+/* Enforce Pure White Text for Solid Primary Buttons & Price Badges Everywhere */
+.bg-brand-600,
+.bg-brand-500,
+.bg-emerald-600,
+.bg-emerald-500,
+.light .bg-brand-600,
+.light .bg-brand-500,
+.light .bg-emerald-600,
+.light .bg-emerald-500 {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Light Mode Theme Palette System (Applies ONLY when .light is active)
+   - Off-White Base: #FAFBFC
+   - Subtle Green Section: #F3FCF8
+   - Soft Mint Container: #EEF9F3
+   - Primary Green Outlines Everywhere: rgba(0, 135, 81, 0.22) / #008751
+   ========================================================================== */
+.light {
+  background-color: #FAFBFC !important;
+  color: #0f172a !important;
+}
+
+/* ALL Outlines and Borders in Light Mode use Primary Green Color (#008751 / rgba(0, 135, 81, 0.22)) */
+.light .border-slate-800,
+.light .border-slate-800\/80,
+.light .border-slate-700,
+.light .border-slate-700\/60,
+.light .border-slate-700\/80,
+.light .border-slate-700\/70,
+.light .border-slate-800\/60,
+.light .border-slate-800\/40,
+.light .glass-card,
+.light .glass-modal,
+.light input,
+.light select,
+.light textarea,
+.light table,
+.light thead,
+.light tbody tr,
+.light header,
+.light footer,
+.light .gate-log-item {
+  border-color: rgba(0, 135, 81, 0.22) !important;
+}
+
+/* Hero Banner in Light Mode: Soft, Smooth Primary Green Outline (#008751) */
+.light .hero-banner {
+  border: 1px solid rgba(0, 135, 81, 0.22) !important;
+  box-shadow: 0 12px 32px -8px rgba(0, 135, 81, 0.08) !important;
+}
+
+/* 1. Light Mode Background Overrides */
+.light .bg-dark-950 {
+  background-color: #ffffff !important;
+}
+
+.light .bg-dark-900,
+.light .bg-dark-900\/90,
+.light .bg-dark-900\/80,
+.light .bg-dark-900\/95 {
+  background-color: #F3FCF8 !important;
+}
+
+.light .bg-dark-800,
+.light .bg-dark-800\/80,
+.light .bg-dark-800\/40,
+.light .bg-dark-800\/60,
+.light .bg-dark-800\/70,
+.light .bg-dark-800\/90 {
+  background-color: #EEF9F3 !important;
+}
+
+.light .bg-slate-900,
+.light .bg-slate-900\/80,
+.light .bg-slate-900\/90 {
+  background-color: #F3FCF8 !important;
+}
+
+/* 2. Glassmorphism Card & Modal Overrides */
+.light .glass-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 135, 81, 0.22) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 135, 81, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02) !important;
+}
+
+.light .glass-card-hover:hover {
+  background: #F3FCF8 !important;
+  border-color: #008751 !important;
+  box-shadow: 0 16px 32px -8px rgba(0, 135, 81, 0.15) !important;
+}
+
+.light .glass-modal {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 135, 81, 0.22) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 135, 81, 0.18) !important;
+  color: #0f172a !important;
+}
+
+/* 3. Gradient Banner Overrides in Light Mode */
+.light .bg-gradient-to-r,
+.light .bg-gradient-to-br,
+.light .bg-gradient-to-tr {
+  background: linear-gradient(135deg, #ffffff 0%, #F3FCF8 50%, #EEF9F3 100%) !important;
+}
+
+.light .bg-gradient-to-r.from-dark-900 {
+  background: linear-gradient(135deg, #ffffff 0%, #F3FCF8 50%, #EEF9F3 100%) !important;
+}
+
+/* 4. Text & Typography Color Overrides in Light Mode */
+.light .text-white {
+  color: #0f172a !important;
+}
+
+/* Ensure elements with text-white inside solid primary green containers stay white! */
+.light .bg-brand-600 .text-white,
+.light .bg-brand-500 .text-white,
+.light .bg-emerald-600 .text-white,
+.light .bg-emerald-500 .text-white,
+.light button.bg-brand-600,
+.light button.bg-brand-500,
+.light span.bg-brand-600 {
+  color: #ffffff !important;
+}
+
+.light .text-slate-100,
+.light .text-slate-200 {
+  color: #1e293b !important;
+}
+
+.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* 5. Brand Green Accent Text & Badges in Light Mode */
+.light .text-brand-400 {
+  color: #008751 !important;
+}
+
+.light .text-brand-300 {
+  color: #006d41 !important;
+}
+
+.light .bg-brand-500\/10 {
+  background-color: #EEF9F3 !important;
+  border-color: rgba(0, 135, 81, 0.22) !important;
+  color: #008751 !important;
+}
+
+.light .bg-brand-500\/15 {
+  background-color: #EEF9F3 !important;
+  border-color: rgba(0, 135, 81, 0.22) !important;
+  color: #008751 !important;
+}
+
+/* 6. Form Inputs & Select Boxes in Light Mode: Pure White #FFFFFF Background Everywhere */
+.light input,
+.light select,
+.light textarea,
+.light .bg-dark-800 input,
+.light .bg-dark-900 input,
+.light .bg-dark-800 select,
+.light .bg-dark-900 select,
+.light .bg-dark-800 textarea,
+.light .bg-dark-900 textarea,
+.light .sqlite-console textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(0, 135, 81, 0.22) !important;
+}
+
+.light input:focus,
+.light select:focus,
+.light textarea:focus {
+  border-color: #008751 !important;
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* 7. Tables (Organizer Dashboard & Attendee Roster) in Light Mode */
+.light table {
+  color: #0f172a !important;
+}
+
+.light thead {
+  background-color: #EEF9F3 !important;
+  color: #008751 !important;
+  border-color: rgba(0, 135, 81, 0.22) !important;
+}
+
+.light tbody tr {
+  border-color: rgba(0, 135, 81, 0.22) !important;
+}
+
+.light tbody tr:hover {
+  background-color: #F3FCF8 !important;
+}
+
+.light .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(0, 135, 81, 0.22) !important;
+}
+
+/* 8. Header & Footer Specifically in Light Mode */
+.light header {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(0, 135, 81, 0.22) !important;
+}
+
+.light footer {
+  background-color: #F3FCF8 !important;
+  border-color: rgba(0, 135, 81, 0.22) !important;
+  color: #334155 !important;
+}
+
+/* 9. Light Mode Action Buttons: Primary Color (#008751) Outline, Fills Primary Color on Hover with White Text */
+.light main button:not(.bg-brand-600):not(.bg-brand-500):not(.bg-accent-600):not(.bg-rose-600) {
+  border: 1px solid #008751 !important;
+  color: #008751 !important;
+  background-color: transparent !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.light main button:not(.bg-brand-600):not(.bg-brand-500):not(.bg-accent-600):not(.bg-rose-600):hover {
+  background-color: #008751 !important;
+  color: #ffffff !important;
+  border-color: #008751 !important;
+}
+
+/* 10. Live Gate Check-In Stream Log Items in Light Mode */
+.light .gate-log-item {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 135, 81, 0.22) !important;
+  box-shadow: 0 2px 8px -2px rgba(0, 135, 81, 0.04) !important;
+}
+
+/* 11. SQLite Database Console Modal in Light Mode */
+.light .sqlite-console {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(0, 135, 81, 0.25) !important;
+}
+
+.light .sqlite-console .console-header,
+.light .sqlite-console .console-stats,
+.light .sqlite-console .console-presets {
+  background-color: #F3FCF8 !important;
+  border-color: rgba(0, 135, 81, 0.22) !important;
+}
+
+/* Custom Scrollbars in Light Mode */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -49,11 +311,19 @@
   background: #0f172a;
 }
 
+.light ::-webkit-scrollbar-track {
+  background: #FAFBFC;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #374151;
   border-radius: 4px;
 }
 
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 135, 81, 0.25);
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #059669;
+  background: #008751;
 }

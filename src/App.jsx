@@ -17,7 +17,7 @@ import { Toast } from './components/Toast';
 
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState('explore');
-  const { activeModal, setActiveModal } = useEventContext();
+  const { activeModal, setActiveModal, theme } = useEventContext();
 
   // Developer Keyboard Shortcut (Cmd/Ctrl + Shift + S) to open SQLite console
   useEffect(() => {
@@ -32,7 +32,9 @@ const AppContent = () => {
   }, [setActiveModal]);
 
   return (
-    <div className="min-h-screen bg-dark-900 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-dark-900">
+    <div className={`min-h-screen ${
+      theme === 'light' ? 'light bg-slate-100 text-slate-900' : 'dark bg-dark-900 text-slate-100'
+    } flex flex-col transition-colors duration-300 selection:bg-brand-500 selection:text-dark-900`}>
       
       {/* Top Navbar */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />

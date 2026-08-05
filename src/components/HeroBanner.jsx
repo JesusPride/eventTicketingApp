@@ -7,7 +7,7 @@ export const HeroBanner = ({ setActiveTab }) => {
   const featuredEvent = events.find(e => e.featured) || events[0];
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-dark-800 via-slate-900 to-dark-900 border border-slate-800/80 shadow-2xl p-6 sm:p-10 mb-10">
+    <div className="hero-banner relative overflow-hidden rounded-3xl bg-gradient-to-br from-dark-800 via-slate-900 to-dark-900 border border-slate-800/80 shadow-2xl p-6 sm:p-10 mb-10">
       {/* Glow Effects */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-brand-500/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/3 -ml-20 -mb-20 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />

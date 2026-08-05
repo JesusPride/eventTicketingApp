@@ -41,13 +41,30 @@ export const EventProvider = ({ children }) => {
   const [checkIns, setCheckIns] = useState([]);
   const [isSqliteReady, setIsSqliteReady] = useState(false);
 
+  // Theme State: default 'dark', saved in localStorage
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('eventpulse_theme') || 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  });
+
+  const toggleTheme = () => {
+    setTheme(prev => {
+      const nextTheme = prev === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('eventpulse_theme', nextTheme);
+      return nextTheme;
+    });
+  };
+
   // User Auth State
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('eventpulse_user_v1');
-      return saved ? JSON.parse(saved) : DEFAULT_USER;
+      return saved ? JSON.parse(saved) : null;
     } catch (e) {
-      return DEFAULT_USER;
+      return null;
     }
   });
 
@@ -83,7 +100,6 @@ export const EventProvider = ({ children }) => {
         }
       } catch (err) {
         console.error('Error starting SQLite database:', err);
-        // Fallback to sample events if initialization has temporary issue
         if (isMounted) {
           setEvents(INITIAL_EVENTS);
         }
@@ -298,6 +314,8 @@ export const EventProvider = ({ children }) => {
   return (
     <EventContext.Provider
       value={{
+        theme,
+        toggleTheme,
         events,
         tickets,
         checkIns,

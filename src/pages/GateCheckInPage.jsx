@@ -258,26 +258,26 @@ export const GateCheckInPage = () => {
                 {checkIns.map((log) => (
                   <div
                     key={log.id}
-                    className="p-3 bg-dark-800/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs"
+                    className="gate-log-item p-3 bg-dark-800/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs transition-colors"
                   >
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-bold text-white">{log.ticketId}</span>
                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                           log.status === 'VERIFIED'
-                            ? 'bg-emerald-500/20 text-emerald-400'
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                             : log.status === 'DUPLICATE'
-                            ? 'bg-amber-500/20 text-amber-400'
-                            : 'bg-rose-500/20 text-rose-400'
+                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
                         }`}>
                           {log.status}
                         </span>
                       </div>
                       {log.attendeeName && (
-                        <p className="text-slate-300 mt-0.5">{log.attendeeName}</p>
+                        <p className="text-slate-300 font-medium mt-0.5">{log.attendeeName}</p>
                       )}
                     </div>
-                    <div className="text-right text-slate-400 text-[11px]">
+                    <div className="text-right text-slate-400 text-[11px] font-mono">
                       {new Date(log.timestamp).toLocaleTimeString('en-GB')}
                     </div>
                   </div>

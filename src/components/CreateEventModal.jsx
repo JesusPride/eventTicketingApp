@@ -30,7 +30,7 @@ export const CreateEventModal = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-900/80 backdrop-blur-md animate-fadeIn">
       <div className="relative w-full max-w-2xl glass-modal rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl flex flex-col max-h-[90vh]">
-        
+
         {/* Header */}
         <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-dark-900/90">
           <div>
@@ -47,7 +47,7 @@ export const CreateEventModal = () => {
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-slate-200">
-          
+
           <div>
             <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1">
               Event Title
@@ -207,7 +207,7 @@ export const CreateEventModal = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3.5 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20 transition-all"
+            className="w-full py-3.5 bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20 transition-all"
           >
             <PlusCircle className="w-5 h-5" />
             Publish Event & Open Ticketing

@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Calendar, Clock, MapPin, Building2, Ticket, CheckCircle2, Share2, ShieldCheck } from 'lucide-react';
-import { formatNGN, formatDate } from '../utils/formatters';
+import { formatNGN, formatDate, getCategoryBadgeStyle } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const EventModal = () => {
@@ -43,7 +43,7 @@ export const EventModal = () => {
           </div>
 
           <div className="absolute bottom-4 left-6 right-6">
-            <span className="bg-brand-500/20 text-brand-400 border border-brand-500/40 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+            <span className={`border text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${getCategoryBadgeStyle(selectedEvent.category)}`}>
               {selectedEvent.category}
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2 leading-tight">

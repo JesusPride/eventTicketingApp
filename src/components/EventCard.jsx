@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, MapPin, Ticket, Tag, Users, ArrowUpRight } from 'lucide-react';
-import { formatNGN, formatDate } from '../utils/formatters';
+import { formatNGN, formatDate, getCategoryBadgeStyle } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const EventCard = ({ event }) => {
@@ -39,7 +39,7 @@ export const EventCard = ({ event }) => {
           
           {/* Top Category Badge & City Badge */}
           <div className="absolute top-3 left-3 flex items-center gap-2">
-            <span className="bg-dark-900/90 text-brand-400 border border-brand-500/30 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md">
+            <span className={`bg-dark-900/90 border text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md ${getCategoryBadgeStyle(event.category)}`}>
               {event.category}
             </span>
             <span className="bg-dark-900/90 text-slate-300 border border-slate-700/60 text-xs font-medium px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1">

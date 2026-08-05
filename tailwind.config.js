@@ -8,12 +8,16 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-          900: '#064e3b',
+          50: '#f0fdf4',
+          100: '#DCFCE7', // Background Accent
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22C55E', // Success Green
+          600: '#008751', // 🇳🇬 Primary Green (Nigerian Flag)
+          700: '#006d41',
+          800: '#005332',
+          900: '#003a23',
         },
         accent: {
           50: '#f5f3ff',
