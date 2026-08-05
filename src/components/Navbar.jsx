@@ -7,12 +7,14 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
     theme,
     toggleTheme,
     tickets,
+    userTickets = [],
     searchQuery,
     setSearchQuery,
     setActiveModal,
     currentUser,
     logoutUser,
-    quickDemoLogin
+    quickDemoLogin,
+    setReturnTab,
   } = useEventContext();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -106,9 +108,9 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
             >
               <Ticket className="w-4 h-4" />
               <span className="hidden sm:inline">My Tickets</span>
-              {tickets.length > 0 && (
+              {userTickets.length > 0 && (
                 <span className="ml-1 px-1.5 py-0.5 text-xs font-bold bg-brand-500 text-dark-900 rounded-full">
-                  {tickets.length}
+                  {userTickets.length}
                 </span>
               )}
             </button>
@@ -247,7 +249,10 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
               </div>
             ) : (
               <button
-                onClick={() => setActiveTab('auth')}
+                onClick={() => {
+                  setReturnTab(activeTab);
+                  setActiveTab('auth');
+                }}
                 className={`ml-2 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl flex items-center gap-1.5 transition-all ${activeTab === 'auth'
                     ? 'bg-brand-500 text-dark-900 shadow-md'
                     : 'bg-dark-800 hover:bg-slate-800 text-brand-400 border border-brand-500/40'

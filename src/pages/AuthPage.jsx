@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, ShieldCheck, Sparkles, Building2, UserCheck, ArrowRight, Ticket, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, User, ShieldCheck, Sparkles, Building2, UserCheck, ArrowRight, Ticket, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useEventContext } from '../context/EventContext';
 
-export const AuthPage = ({ setActiveTab }) => {
-  const { loginUser, signupUser, quickDemoLogin } = useEventContext();
+export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
+  const { loginUser, signupUser, quickDemoLogin, completeAuthAndRedirect, returnTab, pendingBookingEvent } = useEventContext();
   const [mode, setMode] = useState('login'); // 'login' or 'signup'
+  const [showAuthNotice, setShowAuthNotice] = useState(true);
+
+  // Auto-dismiss auth notice banner after 5 seconds
+  React.useEffect(() => {
+    if (pendingBookingEvent) {
+      setShowAuthNotice(true);
+      const timer = setTimeout(() => {
+        setShowAuthNotice(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [pendingBookingEvent]);
 
   // Login State
   const [loginEmail, setLoginEmail] = useState('');
@@ -21,13 +33,14 @@ export const AuthPage = ({ setActiveTab }) => {
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     loginUser(loginEmail, loginPassword);
-    setActiveTab('explore');
+    const role = loginEmail.includes('organizer') ? 'organizer' : 'attendee';
+    completeAuthAndRedirect(role);
   };
 
   const handleSignupSubmit = (e) => {
     e.preventDefault();
     signupUser(signupData.name, signupData.email, signupData.role);
-    setActiveTab(signupData.role === 'organizer' ? 'organizer' : 'explore');
+    completeAuthAndRedirect(signupData.role);
   };
 
   return (
@@ -82,6 +95,19 @@ export const AuthPage = ({ setActiveTab }) => {
         {/* Right Side: Auth Form & Demo Logins */}
         <div className="lg:col-span-7 p-6 sm:p-10 bg-dark-900/95 space-y-6">
           
+          {/* Sign In Required Notice Banner */}
+          {pendingBookingEvent && showAuthNotice && (
+            <div className="p-4 bg-rose-500/15 border border-rose-500/40 rounded-2xl flex items-start gap-3 animate-fadeIn text-rose-200 text-xs font-semibold">
+              <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-white text-sm">Sign In Required</p>
+                <p className="text-slate-300 mt-0.5">
+                  You must sign in before you can generate your event ticket. You will be automatically brought back to complete your ticket pass after signing in!
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Top Switch Mode Header */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <div>
@@ -116,7 +142,7 @@ export const AuthPage = ({ setActiveTab }) => {
                 type="button"
                 onClick={() => {
                   quickDemoLogin('attendee');
-                  setActiveTab('explore');
+                  completeAuthAndRedirect('attendee');
                 }}
                 className="p-3 bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 border border-brand-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
               >
@@ -128,7 +154,7 @@ export const AuthPage = ({ setActiveTab }) => {
                 type="button"
                 onClick={() => {
                   quickDemoLogin('organizer');
-                  setActiveTab('organizer');
+                  completeAuthAndRedirect('organizer');
                 }}
                 className="p-3 bg-accent-500/20 hover:bg-accent-500/30 text-accent-300 border border-accent-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
               >

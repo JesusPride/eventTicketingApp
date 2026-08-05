@@ -5,17 +5,28 @@ import { formatNGN } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const TicketBookingModal = () => {
-  const { selectedEvent, setActiveModal, setSelectedTicketPass, purchaseTicket, showToast } = useEventContext();
+  const {
+    currentUser,
+    selectedEvent,
+    setActiveModal,
+    setSelectedTicketPass,
+    purchaseTicket,
+    showToast,
+    activeTab,
+    setActiveTab,
+    setReturnTab,
+    setPendingBookingEvent,
+  } = useEventContext();
 
   if (!selectedEvent) return null;
 
   const [selectedTier, setSelectedTier] = useState(selectedEvent.tickets[0]);
   const [quantity, setQuantity] = useState(1);
   const [attendee, setAttendee] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    avatar: '',
+    name: currentUser?.name || '',
+    email: currentUser?.email || '',
+    phone: currentUser?.phone || '',
+    avatar: currentUser?.avatar || '',
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [photoError, setPhotoError] = useState(false);
@@ -41,6 +52,16 @@ export const TicketBookingModal = () => {
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
+
+    // Enforce authentication requirement: redirect to sign-in page if not signed in yet
+    if (!currentUser) {
+      setReturnTab(activeTab);
+      setPendingBookingEvent(selectedEvent);
+      setActiveModal(null);
+      setActiveTab('auth');
+      showToast('You must sign in before you can generate a ticket!', 'error');
+      return;
+    }
 
     // Enforce mandatory passport photo upload requirement
     if (!attendee.avatar) {

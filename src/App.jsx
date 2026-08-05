@@ -16,8 +16,12 @@ import { SqliteConsoleModal } from './components/SqliteConsoleModal';
 import { Toast } from './components/Toast';
 
 const AppContent = () => {
-  const [activeTab, setActiveTab] = useState('explore');
-  const { activeModal, setActiveModal, theme } = useEventContext();
+  const { activeTab, setActiveTab, activeModal, setActiveModal, theme } = useEventContext();
+
+  // Scroll window to top whenever activeTab navigation changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
 
   // Developer Keyboard Shortcut (Cmd/Ctrl + Shift + S) to open SQLite console
   useEffect(() => {

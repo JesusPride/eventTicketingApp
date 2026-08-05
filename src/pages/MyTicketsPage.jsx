@@ -1,13 +1,34 @@
 import React, { useState } from 'react';
-import { Ticket, QrCode, Calendar, MapPin, CheckCircle, AlertTriangle, ShoppingBag } from 'lucide-react';
+import { Ticket, QrCode, Calendar, MapPin, CheckCircle, AlertTriangle, ShoppingBag, LogIn } from 'lucide-react';
 import { formatDate, formatNGN } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const MyTicketsPage = ({ setActiveTab }) => {
-  const { tickets, setSelectedTicketPass, setActiveModal } = useEventContext();
+  const { currentUser, userTickets = [], setSelectedTicketPass, setActiveModal } = useEventContext();
   const [filterTab, setFilterTab] = useState('active'); // 'active', 'used', 'all'
 
-  const filteredTickets = tickets.filter(t => {
+  // If user is signed out, prompt them to sign in
+  if (!currentUser) {
+    return (
+      <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto">
+        <div className="glass-card p-12 rounded-3xl border border-slate-800 text-center space-y-4 max-w-lg mx-auto my-12">
+          <LogIn className="w-12 h-12 text-brand-400 mx-auto" />
+          <h3 className="text-xl font-extrabold text-white">Sign In to View Your Digital Passes</h3>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            You are currently signed out. Please sign in to access your digital tickets and gate passes.
+          </p>
+          <button
+            onClick={() => setActiveTab('auth')}
+            className="px-6 py-3 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all"
+          >
+            Sign In Now
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const filteredTickets = userTickets.filter(t => {
     if (filterTab === 'active') return !t.isUsed;
     if (filterTab === 'used') return t.isUsed;
     return true;
@@ -55,7 +76,7 @@ export const MyTicketsPage = ({ setActiveTab }) => {
               : 'bg-dark-800 text-slate-300 hover:bg-slate-800'
           }`}
         >
-          Active Gate Passes ({tickets.filter(t => !t.isUsed).length})
+          Active Gate Passes ({userTickets.filter(t => !t.isUsed).length})
         </button>
 
         <button
@@ -66,7 +87,7 @@ export const MyTicketsPage = ({ setActiveTab }) => {
               : 'bg-dark-800 text-slate-300 hover:bg-slate-800'
           }`}
         >
-          Used / Checked-In ({tickets.filter(t => t.isUsed).length})
+          Used / Checked-In ({userTickets.filter(t => t.isUsed).length})
         </button>
 
         <button
@@ -77,7 +98,7 @@ export const MyTicketsPage = ({ setActiveTab }) => {
               : 'bg-dark-800 text-slate-300 hover:bg-slate-800'
           }`}
         >
-          All Tickets ({tickets.length})
+          All Tickets ({userTickets.length})
         </button>
       </div>
 

@@ -79,6 +79,24 @@ export const EventProvider = ({ children }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedTicketPass, setSelectedTicketPass] = useState(null);
 
+  // Navigation & Return Redirect State
+  const [activeTab, setActiveTab] = useState('explore');
+  const [returnTab, setReturnTab] = useState(null);
+  const [pendingBookingEvent, setPendingBookingEvent] = useState(null);
+
+  const completeAuthAndRedirect = (role) => {
+    const targetTab = returnTab || (role === 'organizer' ? 'organizer' : 'explore');
+    setActiveTab(targetTab);
+    
+    if (pendingBookingEvent) {
+      setSelectedEvent(pendingBookingEvent);
+      setActiveModal('booking');
+      setPendingBookingEvent(null);
+    }
+    
+    setReturnTab(null);
+  };
+
   // Toast Notification State
   const [toast, setToast] = useState(null);
 
@@ -311,6 +329,11 @@ export const EventProvider = ({ children }) => {
     };
   };
 
+  // Filter tickets for current logged in user
+  const userTickets = currentUser
+    ? tickets.filter(t => t.attendeeEmail && currentUser.email && t.attendeeEmail.toLowerCase() === currentUser.email.toLowerCase())
+    : [];
+
   return (
     <EventContext.Provider
       value={{
@@ -318,6 +341,7 @@ export const EventProvider = ({ children }) => {
         toggleTheme,
         events,
         tickets,
+        userTickets,
         checkIns,
         currentUser,
         isSqliteReady,
@@ -340,6 +364,13 @@ export const EventProvider = ({ children }) => {
         setSelectedEvent,
         selectedTicketPass,
         setSelectedTicketPass,
+        activeTab,
+        setActiveTab,
+        returnTab,
+        setReturnTab,
+        pendingBookingEvent,
+        setPendingBookingEvent,
+        completeAuthAndRedirect,
         purchaseTicket,
         addEvent,
         verifyAndCheckInTicket,
