@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, ShieldCheck, Sparkles, Building2, UserCheck, ArrowRight, Ticket, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Mail, Lock, User, ShieldCheck, Sparkles, Building2, UserCheck, ArrowRight, Ticket, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
 import { useEventContext } from '../context/EventContext';
 
 export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
-  const { loginUser, signupUser, quickDemoLogin, completeAuthAndRedirect, returnTab, pendingBookingEvent } = useEventContext();
+  const { loginUser, signupUser, quickDemoLogin, completeAuthAndRedirect, returnTab, pendingBookingEvent, showToast } = useEventContext();
   const [mode, setMode] = useState('login'); // 'login' or 'signup'
   const [showAuthNotice, setShowAuthNotice] = useState(true);
+  const [errors, setErrors] = useState({});
 
   // Auto-dismiss auth notice banner after 5 seconds
   React.useEffect(() => {
@@ -17,6 +18,12 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
       return () => clearTimeout(timer);
     }
   }, [pendingBookingEvent]);
+
+  // Reset validation errors on mode switch
+  const handleSwitchMode = () => {
+    setErrors({});
+    setMode(prev => (prev === 'login' ? 'signup' : 'login'));
+  };
 
   // Login State
   const [loginEmail, setLoginEmail] = useState('');
@@ -32,6 +39,27 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
+    const newErrors = {};
+
+    if (!loginEmail || !loginEmail.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginEmail.trim())) {
+      newErrors.email = 'Please enter a valid email address (e.g. user@example.com)';
+    }
+
+    if (!loginPassword || !loginPassword.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (loginPassword.length < 4) {
+      newErrors.password = 'Password must be at least 4 characters';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      showToast(newErrors.email || newErrors.password, 'error');
+      return;
+    }
+
+    setErrors({});
     loginUser(loginEmail, loginPassword);
     const role = loginEmail.includes('organizer') ? 'organizer' : 'attendee';
     completeAuthAndRedirect(role);
@@ -39,6 +67,27 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
 
   const handleSignupSubmit = (e) => {
     e.preventDefault();
+    const newErrors = {};
+
+    if (!signupData.name || !signupData.name.trim()) {
+      newErrors.name = 'Full name is required';
+    } else if (signupData.name.trim().length < 2) {
+      newErrors.name = 'Please enter a valid full name';
+    }
+
+    if (!signupData.email || !signupData.email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email.trim())) {
+      newErrors.email = 'Please enter a valid email address (e.g. user@example.com)';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      showToast(newErrors.name || newErrors.email, 'error');
+      return;
+    }
+
+    setErrors({});
     signupUser(signupData.name, signupData.email, signupData.role);
     completeAuthAndRedirect(signupData.role);
   };
@@ -120,7 +169,7 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
             </div>
 
             <button
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+              onClick={handleSwitchMode}
               className="text-xs font-bold text-brand-400 hover:text-brand-300 underline"
             >
               {mode === 'login' ? 'Need an account?' : 'Already registered?'}
@@ -172,20 +221,30 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
 
           {/* Form */}
           {mode === 'login' ? (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <form noValidate onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-slate-300 block mb-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="email"
-                    required
                     placeholder="esther.3mtt@example.com"
                     value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500"
+                    onChange={(e) => {
+                      setLoginEmail(e.target.value);
+                      if (errors.email) setErrors(prev => ({ ...prev, email: null }));
+                    }}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${
+                      errors.email ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
+                    }`}
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-[11px] text-rose-400 font-semibold mt-1 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+                    <span>{errors.email}</span>
+                  </p>
+                )}
               </div>
 
               <div>
@@ -194,13 +253,23 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="password"
-                    required
                     placeholder="••••••••"
                     value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500"
+                    onChange={(e) => {
+                      setLoginPassword(e.target.value);
+                      if (errors.password) setErrors(prev => ({ ...prev, password: null }));
+                    }}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${
+                      errors.password ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
+                    }`}
                   />
                 </div>
+                {errors.password && (
+                  <p className="text-[11px] text-rose-400 font-semibold mt-1 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+                    <span>{errors.password}</span>
+                  </p>
+                )}
               </div>
 
               <button
@@ -212,20 +281,30 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSignupSubmit} className="space-y-4">
+            <form noValidate onSubmit={handleSignupSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-slate-300 block mb-1">Full Name</label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
-                    required
                     placeholder="e.g. Adewunmi Esther Opeyemi"
                     value={signupData.name}
-                    onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500"
+                    onChange={(e) => {
+                      setSignupData({ ...signupData, name: e.target.value });
+                      if (errors.name) setErrors(prev => ({ ...prev, name: null }));
+                    }}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${
+                      errors.name ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
+                    }`}
                   />
                 </div>
+                {errors.name && (
+                  <p className="text-[11px] text-rose-400 font-semibold mt-1 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+                    <span>{errors.name}</span>
+                  </p>
+                )}
               </div>
 
               <div>
@@ -234,13 +313,23 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="email"
-                    required
                     placeholder="user@example.com"
                     value={signupData.email}
-                    onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500"
+                    onChange={(e) => {
+                      setSignupData({ ...signupData, email: e.target.value });
+                      if (errors.email) setErrors(prev => ({ ...prev, email: null }));
+                    }}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${
+                      errors.email ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
+                    }`}
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-[11px] text-rose-400 font-semibold mt-1 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+                    <span>{errors.email}</span>
+                  </p>
+                )}
               </div>
 
               <div>

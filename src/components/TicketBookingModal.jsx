@@ -70,6 +70,22 @@ export const TicketBookingModal = () => {
       return;
     }
 
+    // Custom field validation for attendee details
+    if (!attendee.name || !attendee.name.trim()) {
+      showToast('Please enter your full name for the ticket pass.', 'error');
+      return;
+    }
+
+    if (!attendee.email || !attendee.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(attendee.email.trim())) {
+      showToast('Please enter a valid email address.', 'error');
+      return;
+    }
+
+    if (!attendee.phone || !attendee.phone.trim()) {
+      showToast('Please enter your phone number.', 'error');
+      return;
+    }
+
     setIsProcessing(true);
 
     setTimeout(() => {
@@ -120,7 +136,7 @@ export const TicketBookingModal = () => {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleBookingSubmit} className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-200">
+        <form noValidate onSubmit={handleBookingSubmit} className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-200">
 
           {/* Step 1: Select Ticket Tier */}
           <div className="space-y-3">
@@ -255,7 +271,6 @@ export const TicketBookingModal = () => {
                 <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="text"
-                  required
                   placeholder="Enter your Full Name"
                   value={attendee.name}
                   onChange={(e) => setAttendee({ ...attendee, name: e.target.value })}
@@ -267,7 +282,6 @@ export const TicketBookingModal = () => {
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="email"
-                  required
                   placeholder="Enter your Email Address"
                   value={attendee.email}
                   onChange={(e) => setAttendee({ ...attendee, email: e.target.value })}
@@ -279,7 +293,6 @@ export const TicketBookingModal = () => {
                 <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="tel"
-                  required
                   placeholder="Enter your Phone Number"
                   value={attendee.phone}
                   onChange={(e) => setAttendee({ ...attendee, phone: e.target.value })}
