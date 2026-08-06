@@ -15,6 +15,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
     logoutUser,
     quickDemoLogin,
     setReturnTab,
+    setPendingBookingEvent,
   } = useEventContext();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -237,6 +238,8 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                         onClick={() => {
                           logoutUser();
                           setShowUserMenu(false);
+                          setPendingBookingEvent(null);
+                          setReturnTab(null);
                           setActiveTab('auth');
                         }}
                         className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-xl flex items-center gap-2 font-bold"
@@ -250,6 +253,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
             ) : (
               <button
                 onClick={() => {
+                  setPendingBookingEvent(null);
                   setReturnTab(activeTab);
                   setActiveTab('auth');
                 }}

@@ -8,15 +8,15 @@ export const EventModal = () => {
 
   if (!selectedEvent) return null;
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    showToast('Event link copied to clipboard!', 'info');
-  };
+  // const handleShare = () => {
+  //   navigator.clipboard.writeText(window.location.href);
+  //   showToast('Event link copied to clipboard!', 'info');
+  // };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-900/80 backdrop-blur-md animate-fadeIn">
       <div className="relative w-full max-w-3xl glass-modal rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl max-h-[90vh] flex flex-col">
-        
+
         {/* Header Image */}
         <div className="relative h-64 sm:h-72 w-full shrink-0">
           <img
@@ -28,12 +28,12 @@ export const EventModal = () => {
 
           {/* Close & Share Buttons */}
           <div className="absolute top-4 right-4 flex items-center gap-2">
-            <button
+            {/* <button
               onClick={handleShare}
               className="p-2.5 rounded-full bg-dark-900/80 hover:bg-dark-900 text-slate-300 hover:text-white backdrop-blur-md border border-slate-700/60 transition-colors"
             >
               <Share2 className="w-4 h-4" />
-            </button>
+            </button> */}
             <button
               onClick={() => setActiveModal(null)}
               className="p-2.5 rounded-full bg-dark-900/80 hover:bg-dark-900 text-slate-300 hover:text-white backdrop-blur-md border border-slate-700/60 transition-colors"
@@ -54,7 +54,7 @@ export const EventModal = () => {
 
         {/* Modal Body */}
         <div className="p-6 sm:p-8 overflow-y-auto space-y-6 flex-1 text-slate-200">
-          
+
           {/* Quick Date, Time & Location Specs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-dark-800/80 p-4 rounded-2xl border border-slate-800">
             <div className="flex items-start gap-3">
@@ -109,7 +109,7 @@ export const EventModal = () => {
 
             <div className="space-y-2.5">
               {selectedEvent.tickets.map((tier) => (
-                <div 
+                <div
                   key={tier.id}
                   className="flex items-center justify-between p-3.5 bg-dark-800 rounded-xl border border-slate-700/60 hover:border-brand-500/50 transition-colors"
                 >

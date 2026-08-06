@@ -4,7 +4,7 @@ import { formatDate, formatNGN } from '../utils/formatters';
 import { useEventContext } from '../context/EventContext';
 
 export const MyTicketsPage = ({ setActiveTab }) => {
-  const { currentUser, userTickets = [], setSelectedTicketPass, setActiveModal } = useEventContext();
+  const { currentUser, userTickets = [], setSelectedTicketPass, setActiveModal, setPendingBookingEvent, setReturnTab } = useEventContext();
   const [filterTab, setFilterTab] = useState('active'); // 'active', 'used', 'all'
 
   // If user is signed out, prompt them to sign in
@@ -18,7 +18,11 @@ export const MyTicketsPage = ({ setActiveTab }) => {
             You are currently signed out. Please sign in to access your digital tickets and gate passes.
           </p>
           <button
-            onClick={() => setActiveTab('auth')}
+            onClick={() => {
+              setPendingBookingEvent(null);
+              setReturnTab('my-tickets');
+              setActiveTab('auth');
+            }}
             className="px-6 py-3 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all"
           >
             Sign In Now

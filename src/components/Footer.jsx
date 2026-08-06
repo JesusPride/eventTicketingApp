@@ -16,7 +16,7 @@ import {
 import { useEventContext } from '../context/EventContext';
 
 export const Footer = ({ setActiveTab }) => {
-  const { setSelectedCity, setSelectedCategory, setActiveModal, showToast } = useEventContext();
+  const { setSelectedCity, setSelectedCategory, setActiveModal, showToast, setPendingBookingEvent, setReturnTab } = useEventContext();
   const [emailInput, setEmailInput] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -148,7 +148,7 @@ export const Footer = ({ setActiveTab }) => {
                 </button>
               </li>
               <li>
-                <button onClick={() => { setActiveTab('auth'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-brand-400 transition-colors">
+                <button onClick={() => { setPendingBookingEvent(null); setReturnTab('explore'); setActiveTab('auth'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-brand-400 transition-colors">
                   Account Sign In
                 </button>
               </li>

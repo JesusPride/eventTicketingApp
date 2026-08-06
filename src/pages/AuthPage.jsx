@@ -95,7 +95,7 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4 py-12 animate-fadeIn">
       <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 glass-card rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl">
-        
+
         {/* Left Side: Brand Showcase & Features */}
         <div className="lg:col-span-5 p-8 bg-gradient-to-br from-brand-900 via-dark-900 to-slate-900 flex flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -143,7 +143,7 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
 
         {/* Right Side: Auth Form & Demo Logins */}
         <div className="lg:col-span-7 p-6 sm:p-10 bg-dark-900/95 space-y-6">
-          
+
           {/* Sign In Required Notice Banner */}
           {pendingBookingEvent && showAuthNotice && (
             <div className="p-4 bg-rose-500/15 border border-rose-500/40 rounded-2xl flex items-start gap-3 animate-fadeIn text-rose-200 text-xs font-semibold">
@@ -176,49 +176,6 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
             </button>
           </div>
 
-          {/* Quick Demo Sign In Box */}
-          <div className="p-4 bg-dark-800/90 rounded-2xl border border-slate-700/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-                1-Click Quick Demo Sign In
-              </span>
-              <span className="text-[10px] bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded font-mono">3MTT Demo</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  quickDemoLogin('attendee');
-                  completeAuthAndRedirect('attendee');
-                }}
-                className="p-3 bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 border border-brand-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
-              >
-                <UserCheck className="w-4 h-4" />
-                <span>Attendee Mode</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  quickDemoLogin('organizer');
-                  completeAuthAndRedirect('organizer');
-                }}
-                className="p-3 bg-accent-500/20 hover:bg-accent-500/30 text-accent-300 border border-accent-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
-              >
-                <Building2 className="w-4 h-4" />
-                <span>Event Host Mode</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="relative flex py-1 items-center">
-            <div className="flex-grow border-t border-slate-800"></div>
-            <span className="flex-shrink mx-3 text-slate-500 text-xs font-medium uppercase">Or Sign In With Email</span>
-            <div className="flex-grow border-t border-slate-800"></div>
-          </div>
-
           {/* Form */}
           {mode === 'login' ? (
             <form noValidate onSubmit={handleLoginSubmit} className="space-y-4">
@@ -234,9 +191,8 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
                       setLoginEmail(e.target.value);
                       if (errors.email) setErrors(prev => ({ ...prev, email: null }));
                     }}
-                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${
-                      errors.email ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
-                    }`}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${errors.email ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
+                      }`}
                   />
                 </div>
                 {errors.email && (
@@ -259,9 +215,8 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
                       setLoginPassword(e.target.value);
                       if (errors.password) setErrors(prev => ({ ...prev, password: null }));
                     }}
-                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${
-                      errors.password ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
-                    }`}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${errors.password ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
+                      }`}
                   />
                 </div>
                 {errors.password && (
@@ -294,9 +249,8 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
                       setSignupData({ ...signupData, name: e.target.value });
                       if (errors.name) setErrors(prev => ({ ...prev, name: null }));
                     }}
-                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${
-                      errors.name ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
-                    }`}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${errors.name ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
+                      }`}
                   />
                 </div>
                 {errors.name && (
@@ -319,9 +273,8 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
                       setSignupData({ ...signupData, email: e.target.value });
                       if (errors.email) setErrors(prev => ({ ...prev, email: null }));
                     }}
-                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${
-                      errors.email ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
-                    }`}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white focus:outline-none transition-all ${errors.email ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700 focus:border-brand-500'
+                      }`}
                   />
                 </div>
                 {errors.email && (
@@ -338,22 +291,20 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
                   <button
                     type="button"
                     onClick={() => setSignupData({ ...signupData, role: 'attendee' })}
-                    className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${
-                      signupData.role === 'attendee'
-                        ? 'bg-brand-500/20 border-brand-500 text-brand-300'
-                        : 'bg-dark-800 border-slate-700 text-slate-400'
-                    }`}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${signupData.role === 'attendee'
+                      ? 'bg-brand-500/20 border-brand-500 text-brand-300'
+                      : 'bg-dark-800 border-slate-700 text-slate-400'
+                      }`}
                   >
                     👤 Event Attendee
                   </button>
                   <button
                     type="button"
                     onClick={() => setSignupData({ ...signupData, role: 'organizer' })}
-                    className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${
-                      signupData.role === 'organizer'
-                        ? 'bg-accent-500/20 border-accent-500 text-accent-300'
-                        : 'bg-dark-800 border-slate-700 text-slate-400'
-                    }`}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${signupData.role === 'organizer'
+                      ? 'bg-accent-500/20 border-accent-500 text-accent-300'
+                      : 'bg-dark-800 border-slate-700 text-slate-400'
+                      }`}
                   >
                     🏢 Event Host
                   </button>

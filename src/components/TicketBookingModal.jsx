@@ -26,10 +26,11 @@ export const TicketBookingModal = () => {
     name: currentUser?.name || '',
     email: currentUser?.email || '',
     phone: currentUser?.phone || '',
-    avatar: currentUser?.avatar || '',
+    avatar: '', // NO default image fallback - upload is mandatory
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [photoError, setPhotoError] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const totalPrice = selectedTier ? selectedTier.price * quantity : 0;
 
@@ -42,6 +43,7 @@ export const TicketBookingModal = () => {
         return;
       }
       setPhotoError(false);
+      if (errors.avatar) setErrors(prev => ({ ...prev, avatar: null }));
       const reader = new FileReader();
       reader.onloadend = () => {
         setAttendee(prev => ({ ...prev, avatar: reader.result }));
@@ -63,29 +65,37 @@ export const TicketBookingModal = () => {
       return;
     }
 
-    // Enforce mandatory passport photo upload requirement
+    const newErrors = {};
+
+    // Enforce mandatory passport photo upload requirement (NO DEFAULT IMAGE ALLOWED)
     if (!attendee.avatar) {
+      newErrors.avatar = 'Passport photo upload is required before generating ticket.';
       setPhotoError(true);
-      showToast('Please upload a passport photo before generating your ticket.', 'warning');
-      return;
     }
 
     // Custom field validation for attendee details
     if (!attendee.name || !attendee.name.trim()) {
-      showToast('Please enter your full name for the ticket pass.', 'error');
-      return;
+      newErrors.name = 'Full name is required.';
     }
 
-    if (!attendee.email || !attendee.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(attendee.email.trim())) {
-      showToast('Please enter a valid email address.', 'error');
-      return;
+    if (!attendee.email || !attendee.email.trim()) {
+      newErrors.email = 'Email address is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(attendee.email.trim())) {
+      newErrors.email = 'Please enter a valid email address (e.g. name@example.com).';
     }
 
     if (!attendee.phone || !attendee.phone.trim()) {
-      showToast('Please enter your phone number.', 'error');
+      newErrors.phone = 'Phone number is required.';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      showToast(newErrors.avatar || newErrors.name || newErrors.email || newErrors.phone, 'error');
       return;
     }
 
+    setErrors({});
+    setPhotoError(false);
     setIsProcessing(true);
 
     setTimeout(() => {
@@ -266,38 +276,77 @@ export const TicketBookingModal = () => {
               </div>
             </div>
 
-            <div className="space-y-2.5">
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Enter your Full Name"
-                  value={attendee.name}
-                  onChange={(e) => setAttendee({ ...attendee, name: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
-                />
+            <div className="space-y-3">
+              <div>
+                <div className="relative">
+                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Enter your Full Name"
+                    value={attendee.name}
+                    onChange={(e) => {
+                      setAttendee({ ...attendee, name: e.target.value });
+                      if (errors.name) setErrors(prev => ({ ...prev, name: null }));
+                    }}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+                      errors.name ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700/80 focus:border-brand-500'
+                    }`}
+                  />
+                </div>
+                {errors.name && (
+                  <p className="text-[11px] text-rose-400 font-semibold mt-1 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+                    <span>{errors.name}</span>
+                  </p>
+                )}
               </div>
 
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="email"
-                  placeholder="Enter your Email Address"
-                  value={attendee.email}
-                  onChange={(e) => setAttendee({ ...attendee, email: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
-                />
+              <div>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="email"
+                    placeholder="Enter your Email Address"
+                    value={attendee.email}
+                    onChange={(e) => {
+                      setAttendee({ ...attendee, email: e.target.value });
+                      if (errors.email) setErrors(prev => ({ ...prev, email: null }));
+                    }}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+                      errors.email ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700/80 focus:border-brand-500'
+                    }`}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-[11px] text-rose-400 font-semibold mt-1 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+                    <span>{errors.email}</span>
+                  </p>
+                )}
               </div>
 
-              <div className="relative">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="tel"
-                  placeholder="Enter your Phone Number"
-                  value={attendee.phone}
-                  onChange={(e) => setAttendee({ ...attendee, phone: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
-                />
+              <div>
+                <div className="relative">
+                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="tel"
+                    placeholder="Enter your Phone Number"
+                    value={attendee.phone}
+                    onChange={(e) => {
+                      setAttendee({ ...attendee, phone: e.target.value });
+                      if (errors.phone) setErrors(prev => ({ ...prev, phone: null }));
+                    }}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-dark-800 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+                      errors.phone ? 'border-rose-500/80 bg-rose-950/20 focus:border-rose-500' : 'border-slate-700/80 focus:border-brand-500'
+                    }`}
+                  />
+                </div>
+                {errors.phone && (
+                  <p className="text-[11px] text-rose-400 font-semibold mt-1 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+                    <span>{errors.phone}</span>
+                  </p>
+                )}
               </div>
             </div>
           </div>
