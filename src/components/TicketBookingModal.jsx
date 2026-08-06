@@ -90,7 +90,6 @@ export const TicketBookingModal = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      showToast(newErrors.avatar || newErrors.name || newErrors.email || newErrors.phone, 'error');
       return;
     }
 

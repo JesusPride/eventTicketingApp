@@ -68,31 +68,12 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
           {/* Navigation Links */}
           <nav className="flex items-center gap-1 sm:gap-2">
 
-            {/* Theme Switcher Toggle Button */}
-            {/* <button
-              onClick={toggleTheme}
-              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-dark-800/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-all flex items-center gap-1.5"
-            >
-              {theme === 'dark' ? (
-                <>
-                  <Sun className="w-4 h-4 text-amber-400" />
-                  <span className="text-xs font-semibold hidden md:inline">Light</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-4 h-4 text-indigo-400" />
-                  <span className="text-xs font-semibold hidden md:inline">Dark</span>
-                </>
-              )}
-            </button> */}
-
             {/* Explore Link */}
             <button
               onClick={() => setActiveTab('explore')}
               className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'explore'
-                  ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                 }`}
             >
               <Sparkles className="w-4 h-4" />
@@ -103,8 +84,8 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
             <button
               onClick={() => setActiveTab('my-tickets')}
               className={`relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'my-tickets'
-                  ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                 }`}
             >
               <Ticket className="w-4 h-4" />
@@ -122,8 +103,8 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                 <button
                   onClick={() => setActiveTab('gate-scanner')}
                   className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'gate-scanner'
-                      ? 'bg-accent-500/15 text-accent-400 border border-accent-500/40 shadow-lg shadow-accent-500/10'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-accent-500/15 text-accent-400 border border-accent-500/40 shadow-lg shadow-accent-500/10'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                     }`}
                 >
                   <ScanLine className="w-4 h-4 text-accent-400 animate-pulse" />
@@ -133,8 +114,8 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                 <button
                   onClick={() => setActiveTab('organizer')}
                   className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'organizer'
-                      ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                     }`}
                 >
                   <LayoutDashboard className="w-4 h-4" />
@@ -177,31 +158,21 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                       <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
                       <div className="mt-1 flex items-center justify-between">
                         <span className={`px-2 py-0.5 border text-[10px] font-bold rounded-full uppercase ${isOrganizer
-                            ? 'bg-accent-500/20 border-accent-500/40 text-accent-300'
-                            : 'bg-brand-500/20 border-brand-500/40 text-brand-300'
+                          ? 'bg-accent-500/20 border-accent-500/40 text-accent-300'
+                          : 'bg-brand-500/20 border-brand-500/40 text-brand-300'
                           }`}>
                           {currentUser.role} Mode
                         </span>
-
-                        <button
-                          onClick={() => {
-                            quickDemoLogin(isOrganizer ? 'attendee' : 'organizer');
-                            setShowUserMenu(false);
-                          }}
-                          className="text-[10px] text-brand-400 hover:underline font-semibold"
-                        >
-                          Switch to {isOrganizer ? 'Attendee' : 'Host'} Mode
-                        </button>
                       </div>
                     </div>
 
-                    <div className="py-1">
+                    <div className="py-1 space-y-0.5">
                       <button
                         onClick={() => {
                           toggleTheme();
                           setShowUserMenu(false);
                         }}
-                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl flex items-center justify-between font-medium"
+                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-brand-400 rounded-xl flex items-center justify-between font-medium transition-all"
                       >
                         <span className="flex items-center gap-2">
                           {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
@@ -215,9 +186,10 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                           setActiveTab('my-tickets');
                           setShowUserMenu(false);
                         }}
-                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl flex items-center gap-2 font-medium"
+                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-brand-400 rounded-xl flex items-center gap-2 font-medium transition-all"
                       >
-                        <Ticket className="w-4 h-4 text-brand-400" /> My Digital Wallet
+                        <Ticket className="w-4 h-4 text-brand-400 shrink-0" />
+                        <span>My Digital Wallet</span>
                       </button>
 
                       {isOrganizer && (
@@ -226,9 +198,10 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                             setActiveTab('organizer');
                             setShowUserMenu(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl flex items-center gap-2 font-medium"
+                          className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-brand-400 rounded-xl flex items-center gap-2 font-medium transition-all"
                         >
-                          <LayoutDashboard className="w-4 h-4 text-accent-400" /> Host Dashboard
+                          <LayoutDashboard className="w-4 h-4 text-accent-400 shrink-0" />
+                          <span>Host Dashboard</span>
                         </button>
                       )}
                     </div>
@@ -258,8 +231,8 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                   setActiveTab('auth');
                 }}
                 className={`ml-2 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl flex items-center gap-1.5 transition-all ${activeTab === 'auth'
-                    ? 'bg-brand-500 text-dark-900 shadow-md'
-                    : 'bg-dark-800 hover:bg-slate-800 text-brand-400 border border-brand-500/40'
+                  ? 'bg-brand-500 text-dark-900 shadow-md'
+                  : 'bg-dark-800 hover:bg-slate-800 text-brand-400 border border-brand-500/40'
                   }`}
               >
                 <LogIn className="w-4 h-4" />

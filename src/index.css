@@ -260,6 +260,22 @@
   border-color: rgba(0, 135, 81, 0.22) !important;
 }
 
+.light header button:not(.bg-brand-600):not(.bg-brand-500):hover {
+  background-color: #EEF9F3 !important;
+  color: #008751 !important;
+  border-color: rgba(0, 135, 81, 0.3) !important;
+}
+
+.light .glass-modal button:not(.text-rose-400):hover {
+  background-color: #EEF9F3 !important;
+  color: #008751 !important;
+}
+
+.light .glass-modal button.text-rose-400:hover {
+  background-color: rgba(244, 63, 94, 0.12) !important;
+  color: #e11d48 !important;
+}
+
 .light footer {
   background-color: #F3FCF8 !important;
   border-color: rgba(0, 135, 81, 0.22) !important;

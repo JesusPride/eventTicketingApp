@@ -175,7 +175,7 @@ export const EventProvider = ({ children }) => {
     setActiveModal(null);
   };
 
-  const signupUser = (name, email, role, avatar) => {
+  const signupUser = (name, email, role, avatar, autoLogin = false) => {
     const newUser = {
       id: `usr-${Date.now()}`,
       name,
@@ -185,9 +185,14 @@ export const EventProvider = ({ children }) => {
       role,
       avatar: avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
     };
-    setCurrentUser(newUser);
-    showToast(`Account created! Welcome ${name}`, 'success');
+    if (autoLogin) {
+      setCurrentUser(newUser);
+      showToast(`Account created! Welcome ${name}`, 'success');
+    } else {
+      showToast(`Account created successfully for ${name}! Please sign in to continue.`, 'success');
+    }
     setActiveModal(null);
+    return newUser;
   };
 
   const logoutUser = () => {
