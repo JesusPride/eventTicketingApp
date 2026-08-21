@@ -215,7 +215,7 @@ export const EventProvider = ({ children }) => {
     setActiveModal(null);
   };
 
-  const signupUser = (name, email, role, avatar, autoLogin = true) => {
+  const signupUser = (name, email, role, avatar, autoLogin = false) => {
     const cleanEmail = email.trim().toLowerCase();
     const newUser = {
       id: `usr-${Date.now()}`,
@@ -237,8 +237,6 @@ export const EventProvider = ({ children }) => {
     if (autoLogin) {
       setCurrentUser(newUser);
       showToast(`Account created! Welcome ${name} (${role === 'organizer' ? 'Event Host' : 'Attendee'})`, 'success');
-    } else {
-      showToast(`Account created successfully for ${name}! Please sign in to continue.`, 'success');
     }
     setActiveModal(null);
     return newUser;
