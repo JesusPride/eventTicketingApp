@@ -91,8 +91,13 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
     }
 
     setErrors({});
-    const newUser = signupUser(signupData.name, signupData.email, signupData.role, null, true);
-    completeAuthAndRedirect(newUser.role);
+    signupUser(signupData.name, signupData.email, signupData.role, null, false);
+
+    // Switch to Sign In view mode & pre-fill email
+    setLoginEmail(signupData.email);
+    setLoginPassword('');
+    setMode('login');
+    showToast(`Registration successful! Please sign in with your email and password to access your ${signupData.role === 'organizer' ? 'Event Host' : 'Attendee'} account.`, 'success');
   };
 
   return (
