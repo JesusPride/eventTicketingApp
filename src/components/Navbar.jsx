@@ -68,18 +68,6 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
           {/* Navigation Links */}
           <nav className="flex items-center gap-1 sm:gap-2">
 
-            {/* Explore Link */}
-            <button
-              onClick={() => setActiveTab('explore')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'explore'
-                ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-            >
-              <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Explore</span>
-            </button>
-
             {/* My Tickets Link */}
             <button
               onClick={() => setActiveTab('my-tickets')}
