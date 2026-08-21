@@ -169,17 +169,6 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
                         <span className="text-[10px] uppercase font-bold text-brand-400">{theme}</span>
                       </button>
 
-                      <button
-                        onClick={() => {
-                          setActiveTab('my-tickets');
-                          setShowUserMenu(false);
-                        }}
-                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-brand-400 rounded-xl flex items-center gap-2 font-medium transition-all"
-                      >
-                        <Ticket className="w-4 h-4 text-brand-400 shrink-0" />
-                        <span>My Digital Wallet</span>
-                      </button>
-
                       {isOrganizer && (
                         <button
                           onClick={() => {

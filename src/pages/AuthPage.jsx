@@ -59,9 +59,8 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
     }
 
     setErrors({});
-    loginUser(loginEmail, loginPassword);
-    const role = loginEmail.includes('organizer') ? 'organizer' : 'attendee';
-    completeAuthAndRedirect(role);
+    const loggedInUser = loginUser(loginEmail, loginPassword);
+    completeAuthAndRedirect(loggedInUser?.role || 'attendee');
   };
 
   const handleSignupSubmit = (e) => {
@@ -92,13 +91,8 @@ export const AuthPage = ({ setActiveTab: propSetActiveTab }) => {
     }
 
     setErrors({});
-    signupUser(signupData.name, signupData.email, signupData.role, null, false);
-
-    // Redirect to Sign In page on completion of registration
-    setLoginEmail(signupData.email);
-    setLoginPassword('');
-    setMode('login');
-    showToast('Registration successful! Please sign in with your email and password.', 'success');
+    const newUser = signupUser(signupData.name, signupData.email, signupData.role, null, true);
+    completeAuthAndRedirect(newUser.role);
   };
 
   return (

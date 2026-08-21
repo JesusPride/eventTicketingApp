@@ -144,24 +144,64 @@ export const EventProvider = ({ children }) => {
     }
   }, [currentUser]);
 
+  // Registered Users Persistence (stores signed up accounts so role, name, email are preserved)
+  const [registeredUsers, setRegisteredUsers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('eventpulse_registered_users_v1');
+      return saved ? JSON.parse(saved) : [DEFAULT_USER, DEMO_ORGANIZER];
+    } catch (e) {
+      return [DEFAULT_USER, DEMO_ORGANIZER];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('eventpulse_registered_users_v1', JSON.stringify(registeredUsers));
+    } catch (e) {
+      console.error('Failed to save registered users', e);
+    }
+  }, [registeredUsers]);
+
   // Auth Handlers
   const loginUser = (email, password) => {
-    if (email.includes('organizer')) {
-      setCurrentUser(DEMO_ORGANIZER);
-      showToast('Logged in as Event Host Organizer!', 'success');
-    } else {
-      setCurrentUser({
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Check registered users list first
+    const registered = registeredUsers.find(u => u.email.toLowerCase() === cleanEmail);
+
+    let loggedInUser = null;
+
+    if (registered) {
+      loggedInUser = registered;
+    } else if (cleanEmail.includes('organizer') || cleanEmail.includes('host')) {
+      loggedInUser = {
+        ...DEMO_ORGANIZER,
         id: `usr-${Date.now()}`,
-        name: email.split('@')[0].replace('.', ' '),
-        email,
-        handle: `@${email.split('@')[0]}`,
+        email: cleanEmail,
+        name: cleanEmail.split('@')[0].replace('.', ' '),
+      };
+    } else {
+      loggedInUser = {
+        id: `usr-${Date.now()}`,
+        name: cleanEmail.split('@')[0].replace('.', ' '),
+        email: cleanEmail,
+        handle: `@${cleanEmail.split('@')[0]}`,
         phone: '08123456789',
         role: 'attendee',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-      });
-      showToast(`Welcome back, ${email.split('@')[0]}!`, 'success');
+      };
     }
+
+    setCurrentUser(loggedInUser);
+
+    if (loggedInUser.role === 'organizer') {
+      showToast(`Signed in as Event Host (${loggedInUser.name})!`, 'success');
+    } else {
+      showToast(`Welcome back, ${loggedInUser.name}!`, 'success');
+    }
+
     setActiveModal(null);
+    return loggedInUser;
   };
 
   const quickDemoLogin = (role) => {
@@ -175,19 +215,28 @@ export const EventProvider = ({ children }) => {
     setActiveModal(null);
   };
 
-  const signupUser = (name, email, role, avatar, autoLogin = false) => {
+  const signupUser = (name, email, role, avatar, autoLogin = true) => {
+    const cleanEmail = email.trim().toLowerCase();
     const newUser = {
       id: `usr-${Date.now()}`,
-      name,
-      email,
+      name: name.trim(),
+      email: cleanEmail,
       handle: `@${name.toLowerCase().replace(/\s+/g, '')}`,
       phone: '08123456789',
-      role,
-      avatar: avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+      role: role || 'attendee',
+      avatar: avatar || (role === 'organizer' 
+        ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80'
+        : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'),
     };
+
+    setRegisteredUsers(prev => {
+      const filtered = prev.filter(u => u.email.toLowerCase() !== cleanEmail);
+      return [...filtered, newUser];
+    });
+
     if (autoLogin) {
       setCurrentUser(newUser);
-      showToast(`Account created! Welcome ${name}`, 'success');
+      showToast(`Account created! Welcome ${name} (${role === 'organizer' ? 'Event Host' : 'Attendee'})`, 'success');
     } else {
       showToast(`Account created successfully for ${name}! Please sign in to continue.`, 'success');
     }
